@@ -58,16 +58,28 @@
 (require 'pyim-cregexp-utils)
 (pyim-basedict-enable)
 
-(setq default-input-method "pyim")
+;;; put pyim-tsinghua-dict under ~/.emacs.d/site-lisp/
+;;; see https://github.com/redguardtoo/pyim-tsinghua-dict
+(require 'pyim-tsinghua-dict)
+(pyim-tsinghua-dict-enable)
+
+;;; I do not want it to work globally
+;;; I only write text in Chinese in org-mode.
+;; (setq default-input-method "pyim")
+(add-hook 'org-mode-hook
+          (lambda () (pyim-activate) (pyim-toggle-input-ascii)))
+
+(add-hook 'org-mode-hook
+          (lambda () (local-set-key (kbd "M-j") 'pyim-toggle-input-ascii)))
 
 ;; 显示5个候选词。
 (setq pyim-page-length 5)
 
 ;; 金手指设置，可以将光标处的编码，比如：拼音字符串，转换为中文。
-(global-set-key (kbd "M-j") 'pyim-convert-string-at-point)
+;; (global-set-key (kbd "M-j") 'pyim-convert-string-at-point)
 
 ;; 按 "C-<return>" 将光标前的 regexp 转换为可以搜索中文的 regexp.
-(define-key minibuffer-local-map (kbd "C-<return>") 'pyim-cregexp-convert-at-point)
+;; (define-key minibuffer-local-map (kbd "C-<return>") 'pyim-cregexp-convert-at-point)
 
 ;; 我使用全拼
 (pyim-default-scheme 'quanpin)
@@ -76,7 +88,6 @@
 
 ;; 我使用云拼音
 ;; (setq pyim-cloudim 'baidu)
-(setq pyim-cloudim 'google)
 
 ;; pyim 探针设置
 ;; 设置 pyim 探针设置，这是 pyim 高级功能设置，可以实现 *无痛* 中英文切换 :-)
