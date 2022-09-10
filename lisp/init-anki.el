@@ -2,8 +2,6 @@
 ;;; Commentary:
 ;;; Code:
 
-(require 'init-elpa)
-
 ;;; copy from https://yiufung.net/post/anki-org/
 (require-package 'use-package)
 (require-package 'anki-editor)

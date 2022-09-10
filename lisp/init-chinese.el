@@ -2,8 +2,6 @@
 ;;; Commentary: enable Chinese input under org-mode
 ;;; Code:
 
-(require 'init-elpa)
-
 (require-package 'pyim)
 (require-package 'pyim-basedict)
 
