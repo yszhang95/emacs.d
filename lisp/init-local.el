@@ -28,5 +28,27 @@
 ;;; configure Chinese input
 (require 'init-chinese)
 
+;;; CERN ROOT
+(add-hook 'c++-mode-hook
+          (lambda () (setq flycheck-clang-include-path (list (shell-command-to-string "printf %s \"$(root-config --incdir)\""))
+                           )))
+
+(add-hook 'c++-mode-hook
+          (lambda () (setq flycheck-clang-language-standard "c++17")) )
+
+;;; try this for remote git executable.
+;;; However, magit suggest to edit `'tramp-remote-path`
+(setq magit-remote-git-executable "/cvmfs/sft.cern.ch/lcg/contrib/git/2.28.0/x86_64-centos7/bin/git")
+
+
+;;; org GTD
+(if (eq system-type 'darwin)
+  ;;; https://osxdaily.com/2018/01/07/use-sf-mono-font-mac/
+    (setq org-refile-targets '(("~/Dropbox/org/gtd/gtd.org" :maxlevel . 3)
+                               ("~/Dropbox/org/gtd/someday.org" :level . 1)
+                               ("~/Dropbox/org/gtd/tickler.org" :maxlevel . 2)))
+  (setq org-default-notes-file "~/Dropbox/org/gtd/inbox.org")
+  )
+
 (provide 'init-local)
 ;;; init-local.el ends here
