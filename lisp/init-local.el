@@ -44,25 +44,29 @@
 ;;; org GTD
 (defun my-file-style-is-unix ()
   "Return true if the file style is Linux, bsd, macos style"
-  (string-equal system-type "darwin")
   (or (eq system-type 'darwin)
       (eq system-type 'gnu/linux)
       (eq system-type 'gnu/kfreebsd)
       (eq system-type 'cygwin)
       )
   )
+
 (if (my-file-style-is-unix)
-    (setq org-refile-targets '(("~/Dropbox/org/gtd/gtd.org" :maxlevel . 3)
-                               ("~/Dropbox/org/gtd/someday.org" :level . 1)
-                               ("~/Dropbox/org/gtd/tickler.org" :maxlevel . 2)))
-  (setq org-default-notes-file "~/Dropbox/org/gtd/inbox.org")
+    (progn
+      (setq org-refile-targets '(("~/Dropbox/org/gtd/gtd.org" :maxlevel . 3)
+                                 ("~/Dropbox/org/gtd/someday.org" :level . 1)
+                                 ("~/Dropbox/org/gtd/tickler.org" :maxlevel . 2)))
+      (setq org-default-notes-file "~/Dropbox/org/gtd/inbox.org")
+      )
   )
 
 (if (eq system-type 'windows-nt)
-    (setq org-refile-targets '(("c:/Users/yousen/Dropbox/org/gtd/gtd.org" :maxlevel . 3)
-                               ("c:/Users/yousen/Dropbox/org/gtd/someday.org" :level . 1)
-                               ("c:/Users/yousen//Dropbox/org/gtd/tickler.org" :maxlevel . 2)))
-  (setq org-default-notes-file "c:/Users/yousen/Dropbox/org/gtd/inbox.org")
+    (progn
+      (setq org-refile-targets '(("c:/Users/yousen/Dropbox/org/gtd/gtd.org" :maxlevel . 3)
+                                 ("c:/Users/yousen/Dropbox/org/gtd/someday.org" :level . 1)
+                                 ("c:/Users/yousen//Dropbox/org/gtd/tickler.org" :maxlevel . 2)))
+      (setq org-default-notes-file "c:/Users/yousen/Dropbox/org/gtd/inbox.org")
+      )
   )
 
 (provide 'init-local)
