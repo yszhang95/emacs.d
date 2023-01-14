@@ -57,6 +57,7 @@
                                  ("~/Dropbox/org/gtd/someday.org" :level . 1)
                                  ("~/Dropbox/org/gtd/tickler.org" :maxlevel . 2)))
       (setq org-default-notes-file "~/Dropbox/org/gtd/inbox.org")
+      (setq org-agenda-files '("~/Dropbox/org/gtd/inbox.org" "~/Dropbox/org/gtd/gtd.org") )
       )
   )
 
@@ -66,6 +67,8 @@
                                  ("c:/Users/yousen/Dropbox/org/gtd/someday.org" :level . 1)
                                  ("c:/Users/yousen//Dropbox/org/gtd/tickler.org" :maxlevel . 2)))
       (setq org-default-notes-file "c:/Users/yousen/Dropbox/org/gtd/inbox.org")
+      (setq org-agenda-files '("c:/Users/yousen/Dropbox/org/gtd/inbox.org"
+                               "c:/Users/yousen/Dropbox/org/gtd/gtd.org") )
       )
   )
 
