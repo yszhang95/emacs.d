@@ -28,18 +28,12 @@
 ;;; configure Chinese input
 (require 'init-chinese)
 
-;;; CERN ROOT
-(add-hook 'c++-mode-hook
-          (lambda () (setq flycheck-clang-include-path (list (shell-command-to-string "printf %s \"$(root-config --incdir)\""))
-                           )))
-
-(add-hook 'c++-mode-hook
-          (lambda () (setq flycheck-clang-language-standard "c++17")) )
+;;; C++
+(require 'init-cpp)
 
 ;;; try this for remote git executable.
 ;;; However, magit suggest to edit `'tramp-remote-path`
 (setq magit-remote-git-executable "/cvmfs/sft.cern.ch/lcg/contrib/git/2.28.0/x86_64-centos7/bin/git")
-
 
 ;;; org GTD
 (defun my-file-style-is-unix ()
@@ -71,6 +65,14 @@
                                "c:/Users/yousen/Dropbox/org/gtd/gtd.org") )
       )
   )
+
+;;; A package that create table of contents
+;;; https://github.com/alphapapa/org-make-toc
+(maybe-require-package 'org-make-toc)
+
+;;; Convert Org to twiki
+(require-package 'ox-tiddly)
+(require-package 'ox-twiki)
 
 (provide 'init-local)
 ;;; init-local.el ends here
