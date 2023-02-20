@@ -16,11 +16,24 @@
       )
   )
 
+;;; WSL setup
+;;; I use Fedora and I ensure that the font installed
+;;; sudo dnf install adobe-source-han-mono-fonts
+(defun is-wsl ()
+  "Check if it is WSL distributions via the environment variable PATH"
+  ;; convert to t or nil
+  (not (not
+        (string-match "MicrosoftCorporationII.WindowsSubsystemForLinux"
+                      (getenv "PATH")))))
+(when (is-wsl)
+  (set-face-attribute 'default nil :family "Source Han Mono" :height 120)
+  )
+
 ;;; mac special face of font
 (if (eq system-type 'darwin)
-  ;;; https://osxdaily.com/2018/01/07/use-sf-mono-font-mac/
+;;; https://osxdaily.com/2018/01/07/use-sf-mono-font-mac/
     (set-face-attribute 'default nil :font "SF Mono-12")
-)
+  )
 
 ;;; anki-editor
 (require 'init-anki)
