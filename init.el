@@ -128,6 +128,9 @@
 (require 'init-folding)
 (require 'init-dash)
 
+(when (require 'treesit nil t)
+  (require 'init-treesitter))
+
 ;;(require 'init-twitter)
 ;; (require 'init-mu)
 (require 'init-ledger)
