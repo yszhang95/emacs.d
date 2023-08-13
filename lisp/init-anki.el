@@ -44,7 +44,15 @@
 
 ;; Org-capture templates
 ;; (setq org-my-anki-file (expand-file-name "anki.org" "~"))
-(setq org-my-anki-file (substitute-in-file-name "$HOME/anki.org"))
+(let (
+      (yz/my-temp-home-dir (substitute-in-file-name "$HOME"))
+      )
+  (when (eq system-type 'windows-nt)
+    (setq yz/my-temp-home-dir (replace-regexp-in-string "\\\\AppData.*" "" yz/my-temp-home-dir))
+    )
+  (setq org-my-anki-file (concat yz/my-temp-home-dir "/Dropbox/org/anki.org"))
+  )
+
 (add-to-list 'org-capture-templates
              '("a" "Anki basic"
                entry
