@@ -118,10 +118,12 @@
 (require 'init-terraform)
 (require 'init-nix)
 (maybe-require-package 'nginx-mode)
+(maybe-require-package 'just-mode)
+(maybe-require-package 'justl)
 
 (require 'init-paredit)
 (require 'init-lisp)
-(require 'init-slime)
+(require 'init-sly)
 (require 'init-clojure)
 (require 'init-clojure-cider)
 (require 'init-common-lisp)
@@ -136,6 +138,7 @@
 
 (require 'init-ledger)
 (require 'init-lua)
+(require 'init-uiua)
 (require 'init-terminals)
 
 ;; Extra packages which don't require any configuration
