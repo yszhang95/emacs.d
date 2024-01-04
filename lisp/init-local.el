@@ -39,14 +39,14 @@
 (require 'init-anki)
 
 ;;; configure Chinese input
-(require 'init-chinese)
+;;; (require 'init-chinese)
 
 ;;; C++
-(require 'init-cpp)
+;;; (require 'init-cpp)
 
 ;;; try this for remote git executable.
 ;;; However, magit suggest to edit `'tramp-remote-path`
-(setq magit-remote-git-executable "/cvmfs/sft.cern.ch/lcg/contrib/git/2.28.0/x86_64-centos7/bin/git")
+;;; (setq magit-remote-git-executable "/cvmfs/sft.cern.ch/lcg/contrib/git/2.28.0/x86_64-centos7/bin/git")
 
 ;;; org GTD
 (defun my-file-style-is-unix ()
@@ -58,26 +58,28 @@
       )
   )
 
-(if (my-file-style-is-unix)
-    (progn
-      (setq org-refile-targets '(("~/Dropbox/org/gtd/gtd.org" :maxlevel . 3)
-                                 ("~/Dropbox/org/gtd/someday.org" :level . 1)
-                                 ("~/Dropbox/org/gtd/tickler.org" :maxlevel . 2)))
-      (setq org-default-notes-file "~/Dropbox/org/gtd/inbox.org")
-      (setq org-agenda-files '("~/Dropbox/org/gtd/inbox.org" "~/Dropbox/org/gtd/gtd.org") )
-      )
-  )
+;;; https://stackoverflow.com/a/3731037
+(defun setup-org (my-pre-dir)
+  (let ((default-directory my-pre-dir))
+    (setq org-default-notes-file (expand-file-name "org/inbox.org"))
+    (setq org-refile-targets '(`(,(expand-file-name "org/gtd.org") :maxlevel . 3)
+                               `(,(expand-file-name "org/someday.org") :level . 1)
+                               `(,(expand-file-name "org/tickler.org") :maxlevel . 2)))
+    (setq org-agenda-files `(,(expand-file-name "org/inbox.org") ,(expand-file-name "org/gtd.org")))
+    (setq org-directory (expand-file-name "org/"))
+    ;;; overwrite the default value, (org-agenda-files)
+    (setq org-mobile-files `(,(expand-file-name "org/inbox.org")))
+    (setq org-mobile-inbox-for-pull (expand-file-name "mobileorg/inbox.org"))
+    (setq org-mobile-directory (expand-file-name "mobileorg/"))
+    (with-eval-after-load 'projectile-mode-hook
+      (add-to-list 'projectile-globally-ignored-directories
+                   '(`(,(expand-file-name "org/") ,(expand-file-name "mobileorg/")))))))
 
-(if (eq system-type 'windows-nt)
-    (progn
-      (setq org-refile-targets '(("c:/Users/yousen/Dropbox/org/gtd/gtd.org" :maxlevel . 3)
-                                 ("c:/Users/yousen/Dropbox/org/gtd/someday.org" :level . 1)
-                                 ("c:/Users/yousen//Dropbox/org/gtd/tickler.org" :maxlevel . 2)))
-      (setq org-default-notes-file "c:/Users/yousen/Dropbox/org/gtd/inbox.org")
-      (setq org-agenda-files '("c:/Users/yousen/Dropbox/org/gtd/inbox.org"
-                               "c:/Users/yousen/Dropbox/org/gtd/gtd.org") )
-      )
-  )
+(when (eq system-type 'windows-nt)
+  (setup-org "z:/"))
+
+(when (eq system-type 'darwin)
+  (setup-org "/Volumes/Koofr/"))
 
 ;;; A package that create table of contents
 ;;; https://github.com/alphapapa/org-make-toc
