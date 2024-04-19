@@ -4,10 +4,32 @@
 
 ;;; copy from https://yiufung.net/post/anki-org/
 (require-package 'use-package)
-(require-package 'anki-editor)
+(require-package 'sqlite3)
+
+;; (require-package 'anki-editor)
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name
+        "straight/repos/straight.el/bootstrap.el"
+        (or (bound-and-true-p straight-base-dir)
+            user-emacs-directory)))
+      (bootstrap-version 7))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+(straight-use-package 'use-package)
 
 (use-package anki-editor
   :after org
+  :straight (:host github :repo "louietan/anki-editor")
+  :commands anki-editor-mode
+  :custom (anki-editor-latex-style 'mathjax)
   :bind (:map org-mode-map
               ("<f12>" . anki-editor-cloze-region-auto-incr)
               ("<f11>" . anki-editor-cloze-region-dont-incr)
@@ -42,27 +64,29 @@
   (anki-editor-reset-cloze-number)
   )
 
+(use-package ankiorg
+  :straight (:host github :repo "orgtre/ankiorg")
+  :commands
+  ankiorg-pull-notes
+  ankiorg-buffer-get-media-files
+  ankiorg-pull-tags
+  :custom
+  (ankiorg-sql-database (concat yz/my-home-dir "/Koofr/anki/collection.anki2"))
+  (ankiorg-media-directory (concat yz/my-home-dir "/Koofr/anki/img")))
+
 ;; Org-capture templates
-;; (setq org-my-anki-file (expand-file-name "anki.org" "~"))
-(let (
-      (yz/my-temp-home-dir (substitute-in-file-name "$HOME"))
-      )
-  (when (eq system-type 'windows-nt)
-    (setq yz/my-temp-home-dir (replace-regexp-in-string "\\\\AppData.*" "" yz/my-temp-home-dir))
-    )
-  (setq org-my-anki-file (concat yz/my-temp-home-dir "/Dropbox/org/anki.org"))
-  )
+(setq org-my-anki-file (concat yz/my-home-dir "/Koofr/org/anki.org"))
 
 (add-to-list 'org-capture-templates
              '("a" "Anki basic"
                entry
                (file+headline org-my-anki-file "Dispatch Shelf")
-               "* %<%H:%M>   %^g\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic\n:ANKI_DECK: Mega\n:END:\n** Front\n%?\n** Back\n%x\n"))
+               "* %<%Y-%m-%d %H:%M:%S>   %^g\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic\n:ANKI_DECK: Mega\n:END:\n** Front\n%?\n** Back\n%x\n"))
 (add-to-list 'org-capture-templates
              '("A" "Anki cloze"
                entry
                (file+headline org-my-anki-file "Dispatch Shelf")
-               "* %<%H:%M>   %^g\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Cloze\n:ANKI_DECK: Mega\n:END:\n** Text\n%x\n** Extra\n"))
+               "* %<%Y-%m-%d %H:%M:%S>   %^g\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Cloze\n:ANKI_DECK: Mega\n:END:\n** Text\n%x\n** Extra\n"))
 
 (provide 'init-anki)
 ;;; init-anki.el ends here

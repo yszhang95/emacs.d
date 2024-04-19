@@ -2,16 +2,24 @@
 ;;; Commentary:
 ;;; Code:
 
+
+(progn
+  (setq yz/my-home-dir (substitute-in-file-name "$HOME"))
+  (when (eq system-type 'windows-nt)
+    (setq yz/my-home-dir (replace-regexp-in-string "\\\\AppData.*" "" yz/my-temp-home-dir))
+    )
+  )
+
 ;;; special setup on Windows64
 ;;; msys64 has been installed
 (if (eq system-type 'windows-nt)
-    ;;; ispell
+;;; ispell
     (progn
-      ;;; ispell using msys64
+;;; ispell using msys64
       (setq ispell-program-name "C:\\msys64\\mingw64\\bin\\aspell")
-      ;;; font face under resolution 1920x1080
-      ;;; https://github.com/adobe-fonts/source-han-mono/releases
-      ;;; https://www.emacswiki.org/emacs/ChangeFontsPermanentlyOnWindows
+;;; font face under resolution 1920x1080
+;;; https://github.com/adobe-fonts/source-han-mono/releases
+;;; https://www.emacswiki.org/emacs/ChangeFontsPermanentlyOnWindows
       (set-face-attribute 'default nil :family "Source Han Mono" :height 100)
       )
   )
@@ -75,11 +83,7 @@
       (add-to-list 'projectile-globally-ignored-directories
                    '(`(,(expand-file-name "org/") ,(expand-file-name "mobileorg/")))))))
 
-(when (eq system-type 'windows-nt)
-  (setup-org "z:/"))
-
-(when (eq system-type 'darwin)
-  (setup-org "/Volumes/Koofr/"))
+(setup-org (concat yz/my-home-dir "/Koofr/"))
 
 ;;; A package that create table of contents
 ;;; https://github.com/alphapapa/org-make-toc
@@ -88,6 +92,22 @@
 ;;; Convert Org to twiki
 (require-package 'ox-tiddly)
 (require-package 'ox-twiki)
+
+;;; python
+;;; special for MacPorts
+(when (eq system-type 'darwin)
+  (setq treesit-extra-load-path nil))
+
+
+;;; automatically enable eglot in C/C++, python
+(add-hook 'c++-mode-hook 'eglot-ensure)
+(add-hook 'c-mode-hook 'eglot-ensure)
+
+(when (featurep 'init-treesitter)
+  (add-hook 'c++-ts-mode-hook 'eglot-ensure)
+  (add-hook 'c-ts-mode-hook 'eglot-ensure)
+  (add-hook 'python-ts-mode-hook 'eglot-ensure)
+(setq c-block-comment-prefix "* ")
 
 (provide 'init-local)
 ;;; init-local.el ends here
