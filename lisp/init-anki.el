@@ -6,35 +6,14 @@
 (require-package 'use-package)
 (require-package 'sqlite3)
 
-;; (require-package 'anki-editor)
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name
-        "straight/repos/straight.el/bootstrap.el"
-        (or (bound-and-true-p straight-base-dir)
-            user-emacs-directory)))
-      (bootstrap-version 7))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-
-(straight-use-package 'use-package)
-
 (use-package anki-editor
   :after org
-  :straight (:host github :repo "louietan/anki-editor")
   :commands anki-editor-mode
-  :custom (anki-editor-latex-style 'mathjax)
   :bind (:map org-mode-map
               ("<f12>" . anki-editor-cloze-region-auto-incr)
               ("<f11>" . anki-editor-cloze-region-dont-incr)
               ("<f10>" . anki-editor-reset-cloze-number)
-              ("<f9>"  . anki-editor-push-tree))
+              ("<f9>"  . anki-editor-push-note-at-point))
   :hook (org-capture-after-finalize . anki-editor-reset-cloze-number) ; Reset cloze-number after each capture.
   :config
   (setq anki-editor-create-decks t ;; Allow anki-editor to create a new deck if it doesn't exist
@@ -55,17 +34,11 @@
     "Reset cloze number to ARG or 1"
     (interactive)
     (setq my-anki-editor-cloze-number (or arg 1)))
-  (defun anki-editor-push-tree ()
-    "Push all notes under a tree."
-    (interactive)
-    (anki-editor-push-notes '(4))
-    (anki-editor-reset-cloze-number))
   ;; Initialize
   (anki-editor-reset-cloze-number)
   )
 
 (use-package ankiorg
-  :straight (:host github :repo "orgtre/ankiorg")
   :commands
   ankiorg-pull-notes
   ankiorg-buffer-get-media-files

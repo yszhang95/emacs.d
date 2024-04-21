@@ -6,7 +6,7 @@
 (progn
   (setq yz/my-home-dir (substitute-in-file-name "$HOME"))
   (when (eq system-type 'windows-nt)
-    (setq yz/my-home-dir (replace-regexp-in-string "\\\\AppData.*" "" yz/my-temp-home-dir))
+    (setq yz/my-home-dir (replace-regexp-in-string "\\\\AppData.*" "" yz/my-home-dir))
     )
   )
 
@@ -70,18 +70,18 @@
 (defun setup-org (my-pre-dir)
   (let ((default-directory my-pre-dir))
     (setq org-default-notes-file (expand-file-name "org/inbox.org"))
-    (setq org-refile-targets '(`(,(expand-file-name "org/gtd.org") :maxlevel . 3)
-                               `(,(expand-file-name "org/someday.org") :level . 1)
-                               `(,(expand-file-name "org/tickler.org") :maxlevel . 2)))
+    (setq org-refile-targets (list `(,(expand-file-name "org/gtd.org") :maxlevel . 3)
+                                   `(,(expand-file-name "org/someday.org") :level . 1)
+                                   `(,(expand-file-name "org/tickler.org") :maxlevel . 2)))
     (setq org-agenda-files `(,(expand-file-name "org/inbox.org") ,(expand-file-name "org/gtd.org")))
     (setq org-directory (expand-file-name "org/"))
-    ;;; overwrite the default value, (org-agenda-files)
+;;; overwrite the default value, (org-agenda-files)
     (setq org-mobile-files `(,(expand-file-name "org/inbox.org")))
     (setq org-mobile-inbox-for-pull (expand-file-name "mobileorg/inbox.org"))
     (setq org-mobile-directory (expand-file-name "mobileorg/"))
     (with-eval-after-load 'projectile-mode-hook
       (add-to-list 'projectile-globally-ignored-directories
-                   '(`(,(expand-file-name "org/") ,(expand-file-name "mobileorg/")))))))
+                   (list `(,(expand-file-name "org/") ,(expand-file-name "mobileorg/")))))))
 
 (setup-org (concat yz/my-home-dir "/Koofr/"))
 
@@ -106,7 +106,8 @@
 (when (featurep 'init-treesitter)
   (add-hook 'c++-ts-mode-hook 'eglot-ensure)
   (add-hook 'c-ts-mode-hook 'eglot-ensure)
-  (add-hook 'python-ts-mode-hook 'eglot-ensure)
+  (add-hook 'python-ts-mode-hook 'eglot-ensure))
+
 (setq c-block-comment-prefix "* ")
 
 (provide 'init-local)

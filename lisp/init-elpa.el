@@ -1,7 +1,7 @@
 ;;; init-elpa.el --- Settings and helpers for package.el -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
-
+(setq package-check-signature nil)
 (require 'package)
 (require 'cl-lib)
 
