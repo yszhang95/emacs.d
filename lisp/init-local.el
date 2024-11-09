@@ -110,5 +110,9 @@
 
 (setq c-block-comment-prefix "* ")
 
+(require-package 'pyvenv)
+(add-hook 'python-ts-mode-hook (pyvenv-mode 1))
+(setenv "WORKON_HOME" "/Users/yousenzhang/miniforge3/envs")
+
 (provide 'init-local)
 ;;; init-local.el ends here
