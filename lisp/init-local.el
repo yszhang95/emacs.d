@@ -112,6 +112,8 @@
 
 ;; Enable Evil
 (require-package 'evil)
+;;; https://stackoverflow.com/a/56206909
+(setq evil-disable-insert-state-bindings t)
 (evil-mode 1)
 
 (provide 'init-local)
