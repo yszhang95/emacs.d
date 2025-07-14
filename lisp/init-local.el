@@ -75,8 +75,10 @@
                                    `(,(expand-file-name "org/tickler.org") :maxlevel . 2)))
     (setq org-agenda-files `(,(expand-file-name "org/inbox.org") ,(expand-file-name "org/gtd.org")))
     (setq org-directory (expand-file-name "org/"))
+    (setq org-agenda-span 'week)
 ;;; overwrite the default value, (org-agenda-files)
-    (setq org-mobile-files `(,(expand-file-name "org/inbox.org")))
+    (setq org-mobile-files `(,(expand-file-name "org/inbox.org")
+                             ,(expand-file-name "org/gtd.org")))
     (setq org-mobile-inbox-for-pull (expand-file-name "mobileorg/inbox.org"))
     (setq org-mobile-directory (expand-file-name "mobileorg/"))
     (with-eval-after-load 'projectile-mode-hook
@@ -115,6 +117,51 @@
 ;;; https://stackoverflow.com/a/56206909
 (setq evil-disable-insert-state-bindings t)
 (evil-mode 1)
+
+(with-eval-after-load 'evil
+  ;;; normal state
+  (define-key evil-normal-state-map (kbd "C-n") nil)
+  (define-key evil-normal-state-map (kbd "C-p") nil)
+  (define-key evil-normal-state-map (kbd "C-t") nil)
+  ;;; motion state
+  (define-key evil-motion-state-map (kbd "C-d") nil)
+  (define-key evil-motion-state-map (kbd "C-b") nil)
+  (define-key evil-motion-state-map (kbd "C-e") nil)
+  (define-key evil-motion-state-map (kbd "C-f") nil)
+  (define-key evil-motion-state-map (kbd "C-y") nil)
+  (define-key evil-motion-state-map (kbd "C-v") 'evil-scroll-down)
+  (define-key evil-motion-state-map (kbd "M-v") 'evil-scroll-up)
+  (define-key evil-motion-state-map (kbd ",") nil) ;; unbind existing command
+  (evil-set-leader 'normal (kbd ","))  ; Set leader to Space
+  (evil-define-key 'normal 'global (kbd "<leader>v") #'evil-visual-block)
+
+  )
+
+
+(defun my-org-fill-paragraph (&optional justify)
+  "Custom `fill-paragraph` function for Org-mode.
+   - Skips filling paragraphs containing multi-line LaTeX math (`\\[ ... \\]`).
+   - Allows `M-q` to work normally on text and inline math (`\\(...\\)`)."
+  (interactive "P")
+  (let ((start (save-excursion (backward-paragraph) (point)))
+        (end (save-excursion (forward-paragraph) (point)))
+        block-math-found)
+    (save-excursion
+      (goto-char start)
+      ;; Detect `\[ ... \]` blocks spanning multiple lines
+      (while (re-search-forward "^\\\\\\[" end t)
+        (if (re-search-forward "^\\\\\\]" end t)
+            (setq block-math-found t))))
+
+    (if block-math-found
+        ;; Do nothing if multi-line block math is found, preserving formatting
+        nil
+      ;; Otherwise, fill the paragraph normally
+      (org-fill-paragraph justify))))
+
+(add-hook 'org-mode-hook
+          (lambda ()
+            (setq-local fill-paragraph-function #'my-org-fill-paragraph)))
 
 (provide 'init-local)
 ;;; init-local.el ends here
