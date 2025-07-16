@@ -105,6 +105,14 @@
 (add-hook 'c++-mode-hook 'eglot-ensure)
 (add-hook 'c-mode-hook 'eglot-ensure)
 
+(with-eval-after-load 'flymake-flycheck
+  (with-eval-after-load 'flycheck
+    ;; Disable flycheck backends in C/C++ after flymake-flycheck has activated
+    (setq-default
+     flycheck-disabled-checkers
+     (append (default-value 'flycheck-disabled-checkers)
+             '(c/c++-clang c/c++-gcc c/c++-cppcheck)))))
+
 (when (featurep 'init-treesitter)
   (add-hook 'c++-ts-mode-hook 'eglot-ensure)
   (add-hook 'c-ts-mode-hook 'eglot-ensure)
