@@ -104,6 +104,7 @@
 ;;; automatically enable eglot in C/C++, python
 (add-hook 'c++-mode-hook 'eglot-ensure)
 (add-hook 'c-mode-hook 'eglot-ensure)
+(add-hook 'python-base-mode-hook 'eglot-ensure)
 
 (with-eval-after-load 'flymake-flycheck
   (with-eval-after-load 'flycheck
@@ -115,8 +116,7 @@
 
 (when (featurep 'init-treesitter)
   (add-hook 'c++-ts-mode-hook 'eglot-ensure)
-  (add-hook 'c-ts-mode-hook 'eglot-ensure)
-  (add-hook 'python-ts-mode-hook 'eglot-ensure))
+  (add-hook 'c-ts-mode-hook 'eglot-ensure))
 
 (setq c-block-comment-prefix "* ")
 
@@ -196,7 +196,7 @@
   (cl-defmethod eglot-handle-notification :after
     (_server (_method (eql textDocument/publishDiagnostics)) &key uri
              &allow-other-keys)
-    (when-let ((buffer (find-buffer-visiting (eglot-uri-to-path uri))))
+    (when-let ((buffer (find-buffer-visiting (eglot--uri-to-path uri))))
       (with-current-buffer buffer
         (if (and (eq nil flymake-no-changes-timeout)
                  (not (buffer-modified-p)))
@@ -227,14 +227,14 @@
 
   ;; https://github.com/joaotavora/eglot/discussions/876
   ;; https://github.com/microsoft/pyright/issues/3282
-  (defun eglot-uri-to-path@around (fun url)
+  (defun eglot--uri-to-path@around (fun url)
     (let* ((uri (if (equal url "")
                     (project-root (eglot--project (eglot-current-server))) url))
            (path (funcall fun uri)))
       (if (file-directory-p path)
           (file-name-as-directory path)
         path)))
-  (advice-add #'eglot-uri-to-path :around #'eglot-uri-to-path@around)
+  (advice-add #'eglot--uri-to-path :around #'eglot--uri-to-path@around)
   )
 ;;; I added this line according to https://emacs.stackexchange.com/a/60823
 (setq enable-remote-dir-locals t)
@@ -259,29 +259,33 @@
   :ensure t
   :config
   (setq
-   gptel-model 'mistral:7b-instruct
+   gptel-model 'gemma3n:e4b-it-q4_K_M
    gptel-backend (gptel-make-ollama "Ollama"
                    :host "localhost:11434"
                    :stream t
-                   :models '(llama3.1:8b codegemma:7b-instruct
-                                         mistral:7b-instruct))))
+                   :models '(llama3.1:8b
+                             codegemma:7b-instruct
+                             mistral:7b-instruct
+                             gemma3n:e4b-it-q4_K_M
+                             nous-hermes2:10.7b-solar-q4_0))))
 
 
 (add-hook 'eglot-managed-mode-hook #'gpt/eglot-hook)
 
 ;; Copilot
 (require-package 'copilot)
-(setq copilot-network-proxy
-      '(:host "localhost" :port 11434 :rejectUnauthorized :json-false))
 ;; (add-hook 'prog-mode-hook #'copilot-mode)
 (add-hook 'cbase-mode-hook #'copilot-mode)
 (add-hook 'python-base-mode-hook #'copilot-mode)
+;; (setq copilot-network-proxy '(:host "127.0.0.1" :port 11435 :rejectUnauthorized :json-false))
+;; (setq copilot-lsp-settings
+;;       '(:http (:proxy "http://127.0.0.1:11435" :proxyStrictSSL :json-false)))
 (with-eval-after-load 'copilot
   (define-key copilot-mode-map (kbd "C-<tab>" )
               #'copilot-accept-completion)
+  (setq copilot-idle-delay 0.5)
+  ;; (setq copilot-lsp-settings '(:github (:copilot (:selectedCompletionModel "o4-mini"))))
   )
-;; (setq copilot-log-max 1000
-;;       copilot-server-args '("--stdio" "--debug"))
 
 ;; TRAMP
 (use-package tramp
