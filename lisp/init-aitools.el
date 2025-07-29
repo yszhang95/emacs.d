@@ -13,7 +13,7 @@
                    (display-line-numbers-mode 1))))
   :init
   (setq gptel-default-mode #'org-mode)
-  (setq gptel-model 'chatgpt-4.1)
+  (setq gptel-model 'gpt-4.1)
   (setq gptel-backend (gptel-make-gh-copilot "Copilot"))
   :config
   (add-hook 'gptel-post-response-functions 'gptel-end-of-response)
