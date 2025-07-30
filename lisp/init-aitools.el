@@ -30,9 +30,17 @@
 
 ;;; aidermacs
 (require-package 'aidermacs)
-(setq aidermacs-default-chat-mode "ollama_chat/gemma3:4b")
-(setq aidermacs-default-model "ollama_chat/gemma3:12b")
-(setq aidermacs-architect-model "ollama_chat/gemma3:12b")
+;; (setq aidermacs-default-chat-mode "ollama_chat/gemma3:4b")
+;; (setq aidermacs-default-model "ollama_chat/gemma3:12b")
+;; (setq aidermacs-architect-model "ollama_chat/gemma3:12b")
+
+;;; https://github.com/Aider-AI/aider/issues/2227
+;;; This solution works by upgrading litellm to 1.74.
+;;; https://github.com/MatthewZMD/aidermacs/issues/127
+;;; not working as of 2025-07-30
+(setq aidermacs-default-chat-mode "github_copilot/gpt-4o")
+(setq aidermacs-default-model "github_copilot/gpt-4.1")
+(setq aidermacs-architect-model "github_copilot/gpt-4o")
 (setq aidermacs-default-chat-mode 'architect)
 
 ;; Copilot

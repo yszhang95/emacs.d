@@ -2,7 +2,6 @@
 ;;; Commentary:
 ;;; Code:
 
-
 (progn
   (setq yz/my-home-dir (substitute-in-file-name "$HOME"))
   (when (eq system-type 'windows-nt)
@@ -72,6 +71,7 @@
     (setq org-default-notes-file (expand-file-name "org/inbox.org"))
     (setq org-refile-targets (list `(,(expand-file-name "org/gtd.org") :maxlevel . 3)
                                    `(,(expand-file-name "org/someday.org") :level . 1)
+                                   `(,(expand-file-name "org/notes.org") :level . 2)
                                    `(,(expand-file-name "org/tickler.org") :maxlevel . 2)))
     (setq org-agenda-files `(,(expand-file-name "org/inbox.org") ,(expand-file-name "org/gtd.org")))
     (setq org-directory (expand-file-name "org/"))
@@ -99,6 +99,34 @@
 ;;; special for MacPorts
 (when (eq system-type 'darwin)
   (setq treesit-extra-load-path nil))
+
+
+;;; https://github.com/emacs-jupyter/jupyter
+;;; https://youtu.be/KHu5OnHc6V8?si=Y2K-XpH8jqZsMPi9
+;;; https://github.com/jkitchin/scimax/blob/master/scimax-jupyter.el
+;;; To build zmq, you need a emacs binary under $PATH.
+;;; ln -s "/Applications/MacPorts/EmacsMac.app/Contents/MacOS/Emacs" ~/.local/bin/emacs
+;;; or follow https://github.com/nnicandro/emacs-zmq/issues/47#issuecomment-2833930521
+(require-package 'jupyter)
+(require 'jupyter)
+(with-eval-after-load 'org
+  (require 'ob-jupyter))
+(with-eval-after-load 'org-mode
+  (add-to-list 'org-babel-load-languages '(jupyter . t) t)
+  (add-hook 'org-babel-after-execute-hook 'org-display-inline-images))
+
+(setq org-babel-default-header-args:jupyter-python
+      '((:results . "both")
+        ;; This seems to lead to buffer specific sessions!
+        (:session . (lambda () (buffer-file-name)))
+        (:kernel . "python3")
+        (:pandoc . "t")
+        (:exports . "both")
+        (:cache .   "no")
+        (:noweb . "no")
+        (:hlines . "no")
+        (:tangle . "no")
+        (:eval . "never-export")))
 
 
 ;;; automatically enable eglot in C/C++, python
