@@ -42,6 +42,7 @@
 (setq aidermacs-default-model "github_copilot/gpt-4.1")
 (setq aidermacs-architect-model "github_copilot/gpt-4o")
 (setq aidermacs-default-chat-mode 'architect)
+(global-set-key (kbd "C-c C-a") #'aidermacs-transient-menu)
 
 ;; Copilot
 (require-package 'copilot)
@@ -63,6 +64,12 @@
 (global-set-key (kbd "C-c C-y") #'copilot-chat-yank)
 (global-set-key (kbd "C-c M-y") #'copilot-chat-yank-pop)
 (global-set-key (kbd "C-c C-M-y") #'(lambda () (interactive) (copilot-chat-yank-pop -1)))
+
+
+;;; In the future, I want to try:
+;;; - https://github.com/h-ohsaki/chatgpt-el
+;;; - https://github.com/stevemolitor/claude-code.el
+;;; - https://github.com/cpoile/claudemacs
 
 
 (provide 'init-aitools)

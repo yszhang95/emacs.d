@@ -3,13 +3,12 @@
 ;;; Code:
 
 (require-package 'pyim)
-(require-package 'pyim-basedict)
 
 ;;; Chinese input from https://github.com/tumashu/pyim
 (require 'pyim)
-(require 'pyim-basedict)
+;; (require 'pyim-basedict)
 (require 'pyim-cregexp-utils)
-(pyim-basedict-enable)
+;; (pyim-basedict-enable)
 
 ;;; put pyim-tsinghua-dict under ~/.emacs.d/site-lisp/
 ;;; see https://github.com/redguardtoo/pyim-tsinghua-dict
@@ -30,11 +29,14 @@
 ;;; I do not want it to work globally
 ;;; I only write text in Chinese in org-mode.
 ;; (setq default-input-method "pyim")
-(add-hook 'org-mode-hook
-          (lambda () (pyim-activate) (pyim-toggle-input-ascii)))
+;; (add-hook 'org-mode-hook
+;;           (lambda () (pyim-activate) (pyim-toggle-input-ascii)))
+(add-hook 'org-mode-hook (pyim-activate))
 
-(add-hook 'org-mode-hook
-          (lambda () (local-set-key (kbd "M-j") 'pyim-toggle-input-ascii)))
+(with-eval-after-load 'org
+  ;; (define-key org-mode-map (kbd "C-M-j") #'pyim-toggle-input-ascii)
+  (define-key org-mode-map (kbd "M-j") #'pyim-convert-string-at-point)
+  (define-key org-mode-map (kbd "C-M-j")   #'pyim-convert-string-at-point))
 
 ;; 显示5个候选词。
 (setq pyim-page-length 5)
@@ -51,7 +53,7 @@
 ;; (pyim-default-scheme 'cangjie)
 
 ;; 我使用云拼音
-;; (setq pyim-cloudim 'baidu)
+(setq pyim-cloudim 'google)
 
 ;; pyim 探针设置
 ;; 设置 pyim 探针设置，这是 pyim 高级功能设置，可以实现 *无痛* 中英文切换 :-)
@@ -59,19 +61,21 @@
 ;; 1. 光标只有在注释里面时，才可以输入中文。
 ;; 2. 光标前是汉字字符时，才能输入中文。
 ;; 3. 使用 M-j 快捷键，强制将光标前的拼音字符串转换为中文。
-;; (setq-default pyim-english-input-switch-functions
-;;               '(pyim-probe-dynamic-english
-;;                 pyim-probe-isearch-mode
-;;                 pyim-probe-program-mode
-;;                 pyim-probe-org-structure-template))
+(setq-default pyim-english-input-switch-functions
+              '(pyim-probe-dynamic-english
+                pyim-probe-isearch-mode
+                pyim-probe-program-mode
+                pyim-probe-org-structure-template))
 
-;; (setq-default pyim-punctuation-half-width-functions
-;;               '(pyim-probe-punctuation-line-beginning
-;;                 pyim-probe-punctuation-after-punctuation))
-(setq-default pyim-punctuation-translate-p '(no))
+(setq-default pyim-punctuation-half-width-functions
+              '(pyim-probe-punctuation-line-beginning
+                pyim-probe-punctuation-after-punctuation))
+;; (setq-default pyim-punctuation-translate-p '(no))
 
 ;; 开启代码搜索中文功能（比如拼音，五笔码等）
 ;; (pyim-isearch-mode 1)
+(add-hook 'org-mode-hook (lambda () (pyim-isearch-mode 1)))
+
 
 (provide 'init-chinese)
 ;;; init-chinese.el ends here

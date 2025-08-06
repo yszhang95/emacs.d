@@ -46,7 +46,8 @@
 (require 'init-anki)
 
 ;;; configure Chinese input
-;;; (require 'init-chinese)
+;; (require 'init-chinese)
+;; a lot of things broken
 
 ;;; C++
 ;;; (require 'init-cpp)
@@ -85,7 +86,7 @@
       (add-to-list 'projectile-globally-ignored-directories
                    (list `(,(expand-file-name "org/") ,(expand-file-name "mobileorg/")))))))
 
-(setup-org (concat yz/my-home-dir "/Koofr/"))
+;; (setup-org (concat yz/my-home-dir "/Koofr/"))
 
 ;;; A package that create table of contents
 ;;; https://github.com/alphapapa/org-make-toc
@@ -95,24 +96,31 @@
 (require-package 'ox-tiddly)
 (require-package 'ox-twiki)
 
-;;; python
 ;;; special for MacPorts
 (when (eq system-type 'darwin)
   (setq treesit-extra-load-path nil))
 
-
+;;; python
 ;;; https://github.com/emacs-jupyter/jupyter
 ;;; https://youtu.be/KHu5OnHc6V8?si=Y2K-XpH8jqZsMPi9
 ;;; https://github.com/jkitchin/scimax/blob/master/scimax-jupyter.el
 ;;; To build zmq, you need a emacs binary under $PATH.
 ;;; ln -s "/Applications/MacPorts/EmacsMac.app/Contents/MacOS/Emacs" ~/.local/bin/emacs
 ;;; or follow https://github.com/nnicandro/emacs-zmq/issues/47#issuecomment-2833930521
+;;; https://raw.githubusercontent.com/jkitchin/ox-ipynb/refs/heads/master/ox-ipynb.el
+;;; https://kitchingroup.cheme.cmu.edu/blog/2017/01/21/Exporting-org-mode-to-Jupyter-notebooks/
+;;; https://martibosch.github.io/jupyter-emacs-universe/
+;;; I am forced to use "C-c '" in org-mode to edit the jupyter source block,
+;;; https://github.com/emacs-jupyter/jupyter/issues/488.
+;;; https://github.com/emacs-jupyter/jupyter/issues/478#issuecomment-1676442126
 (require-package 'jupyter)
-(require 'jupyter)
+(require-package 'code-cells)
+(add-hook 'python-base-mode-hook 'code-cells-mode-maybe)
+(require 'ox-ipynb)
 (with-eval-after-load 'org
-  (require 'ob-jupyter))
-(with-eval-after-load 'org-mode
+  (require 'ob-jupyter)
   (add-to-list 'org-babel-load-languages '(jupyter . t) t)
+  (org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)
   (add-hook 'org-babel-after-execute-hook 'org-display-inline-images))
 
 (setq org-babel-default-header-args:jupyter-python
@@ -128,11 +136,10 @@
         (:tangle . "no")
         (:eval . "never-export")))
 
-
 ;;; automatically enable eglot in C/C++, python
 (add-hook 'c++-mode-hook 'eglot-ensure)
 (add-hook 'c-mode-hook 'eglot-ensure)
-(add-hook 'python-base-mode-hook 'eglot-ensure)
+(add-hook 'python-mode-hook 'eglot-ensure)
 
 (with-eval-after-load 'flymake-flycheck
   (with-eval-after-load 'flycheck
@@ -169,9 +176,7 @@
   (define-key evil-motion-state-map (kbd "M-v") 'evil-scroll-up)
   (define-key evil-motion-state-map (kbd ",") nil) ;; unbind existing command
   (evil-set-leader 'normal (kbd ","))  ; Set leader to Space
-  (evil-define-key 'normal 'global (kbd "<leader>v") #'evil-visual-block)
-
-  )
+  (evil-define-key 'normal 'global (kbd "<leader>v") #'evil-visual-block))
 
 
 (defun my-org-fill-paragraph (&optional justify)
@@ -215,10 +220,10 @@
 
   (add-to-list 'eglot-server-programs
                `((python-mode python-ts-mode) . ,(eglot-alternatives
-                                                  '(("delance-langserver" "--stdio")
-                                                    ("ruff" "server" "--preview")
-                                                    "pylsp" "pyls" ("basedpyright-langserver" "--stdio")
+                                                  '("pylsp"
+                                                    ("basedpyright-langserver" "--stdio")
                                                     ("pyright-langserver" "--stdio")
+                                                    "ruff-lsp"
                                                     "jedi-language-server"))))
 
   (cl-defmethod eglot-handle-notification :after
@@ -292,6 +297,81 @@
 
 ;;; AI tools
 (require 'init-aitools)
+
+;;; miscellaneous
+(require 'org-protocol)
+(add-to-list 'org-capture-templates
+             '("p" "Protocol" entry
+               (file+headline "~/org/inbox.org" "Protocol")
+               "* %:description\n\n%:link\n\n%:initial"))
+
+
+(require-package 'pdf-tools)
+;;; if not found epdfinfo, do (pdf-tools-install)
+(when (eq system-type 'darwin)  ;; I work with MacPorts
+  ;; Set PKG_CONFIG_PATH for MacPorts
+  (setenv "PKG_CONFIG_PATH"
+          (concat "/opt/local/lib/pkgconfig:"
+                  (or (getenv "PKG_CONFIG_PATH") "")))
+  ;; Install or rebuild pdf-tools
+  (pdf-tools-install))
+(add-to-list 'auto-mode-alist '("\\.pdf\\'" . pdf-view-mode))
+
+(use-package org-noter
+  :ensure t
+  :demand t
+  :config
+  (setq org-noter-default-notes-file (expand-file-name "org/Notes/notes.org")
+        org-noter-notes-search-path '("~/org/Notes/")))
+
+;;; tested on emacs-mac-app; not official GNU/EMacs
+(require-package 'org-download)
+;; Drag-and-drop to `dired`
+(add-hook 'dired-mode-hook 'org-download-enable)
+(with-eval-after-load 'org
+  (org-download-enable)
+  (when (eq system-type 'darwin)
+    (define-key org-mode-map (kbd "C-y") #'gpt/org-smart-yank-macos)
+    (setq org-download-screenshot-method "screencapture -i %s"))
+  (define-key org-mode-map (kbd "C-M-y") #'org-download-clipboard))
+(setq-default org-download-image-dir (expand-file-name "~/org/images"))
+(setq-default org-download-heading-lvl 1)
+;; (setq org-download-method 'attach)
+(setq org-image-actual-width 600)
+
+(defun gpt/org-smart-yank-macos ()
+  "In Org-mode, paste clipboard image via `org-download-clipboard` if clipboard has image; else, yank text."
+  (interactive)
+  (if (and (derived-mode-p 'org-mode)
+           (display-graphic-p)
+           (gpt/image-in-clipboard-macos-p))
+      (org-download-clipboard)
+    (org-yank)))
+
+(defun gpt/image-in-clipboard-macos-p ()
+  "Return non-nil if clipboard contains image data (macOS only, requires pngpaste)."
+  (executable-find "pngpaste") ;; ensures pngpaste is installed
+  ;; (eq 0 (call-process "pngpaste" nil nil nil "-b" "org.openclipboard.png" "-"))
+  (eq 0 (call-process "pngpaste" nil nil nil "-")))
+
+(use-package org-roam
+  :custom
+  (org-roam-directory (file-truename "~/org/roam/"))
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n g" . org-roam-graph)
+         ("C-c n i" . org-roam-node-insert)
+         ("C-c n c" . org-roam-capture)
+         ;; Dailies
+         ("C-c n j" . org-roam-dailies-capture-today))
+  :config
+  ;; If you're using a vertical completion framework, you might want a more informative completion interface
+  (setq org-roam-node-display-template
+        (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+  (org-roam-db-autosync-mode)
+  ;; If using org-roam-protocol
+  (require 'org-roam-protocol))
+
 
 (provide 'init-local)
 ;;; init-local.el ends here
