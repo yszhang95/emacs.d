@@ -20,9 +20,11 @@
   (gptel-make-ollama "Ollama"
     :host "localhost:11434"
     :stream t
-    :models '(llama3.1:8b
+    :models '(gpt-oss:20b,
+              llama3.1:8b
               codegemma:7b-instruct
               mistral:7b-instruct
+              gemma3:latest
               gemma3:4b
               gemma3:12b
               gemma3n:e4b-it-q4_K_M

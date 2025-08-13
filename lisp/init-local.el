@@ -2,6 +2,8 @@
 ;;; Commentary:
 ;;; Code:
 
+(global-set-key (kbd "C-x 0") 'switch-window-then-delete)
+
 (progn
   (setq yz/my-home-dir (substitute-in-file-name "$HOME"))
   (when (eq system-type 'windows-nt)
@@ -117,6 +119,17 @@
 (require-package 'code-cells)
 (add-hook 'python-base-mode-hook 'code-cells-mode-maybe)
 (require 'ox-ipynb)
+
+;; Compute current Python interpreter (from PATH, direnv, uv, etc.)
+;; https://github.com/python-lsp/python-lsp-server/issues/29#issuecomment-882161177
+;; (setq-default eglot-workspace-configuration
+;;               `(:pylsp
+;;                 (:plugins
+;;                  (:jedi (:environment ,(or (executable-find "python3")
+;;                                            (executable-find "python"))))
+;;                  ;; optional: mypy via pylsp-mypy
+;;                  (:mypy (:enabled t :live_mode t :dmypy t)))))
+
 (with-eval-after-load 'org
   (require 'ob-jupyter)
   (add-to-list 'org-babel-load-languages '(jupyter . t) t)
@@ -321,8 +334,14 @@
   :ensure t
   :demand t
   :config
-  (setq org-noter-default-notes-file (expand-file-name "org/Notes/notes.org")
-        org-noter-notes-search-path '("~/org/Notes/")))
+  (setq org-noter-default-notes-file (expand-file-name "~/org/Notes/notes.org")
+        org-noter-notes-search-path '("~/org/roam/"))
+;;; https://github.com/org-noter/org-noter/issues/100#issuecomment-3161843750
+;;; https://github.com/org-noter/org-noter?tab=readme-ov-file#customization
+  (org-noter-enable-org-roam-integration)
+ ;;; https://github.com/org-noter/org-noter/issues/100#issuecomment-3161843750
+ ;;; (require 'org-macs)
+  )
 
 ;;; tested on emacs-mac-app; not official GNU/EMacs
 (require-package 'org-download)
@@ -372,6 +391,60 @@
   ;; If using org-roam-protocol
   (require 'org-roam-protocol))
 
+(use-package org-roam-ui
+  :ensure t
+  :after org-roam ;; or :after org
+  ;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+  ;;         a hookable mode anymore, you're advised to pick something yourself
+  ;;         if you don't care about startup time, use
+  ;;  :hook (after-init . org-roam-ui-mode)
+  :config
+  (setq org-roam-ui-sync-theme t
+        org-roam-ui-follow t
+        org-roam-ui-update-on-save t
+        org-roam-ui-open-on-start t))
+
+
+(use-package citar
+  :ensure t
+  :custom
+  (citar-bibliography '("~/org/references.bib"))
+  (org-cite-insert-processor 'citar)
+  (org-cite-follow-processor 'citar)
+  (org-cite-activate-processor 'citar)
+  (citar-library-paths '("~/references/"))
+  ;; (citar-bibliography org-cite-global-bibliography)
+  (citar-org-roam-note-title-template "${author} - ${title}\npdf: ${file}")
+  (citar-notes-paths '("~/org/roam/"))
+  :bind
+  (:map org-mode-map :package org ("C-c b" . #'org-cite-insert))
+  :hook
+  (LaTeX-mode . citar-capf-setup)
+  (org-mode . citar-capf-setup))
+
+(use-package citar-embark
+  :ensure t
+  :after citar embark
+  :no-require
+  :config (citar-embark-mode))
+
 
 (provide 'init-local)
 ;;; init-local.el ends here
+
+
+;; (use-package org-ref
+;;   :ensure t
+;;   :config
+;;   (setq bibtex-completion-bibliography '("~/org/references.bib")
+;;         ;; bibtex-completion-notes-path "~/Documents/org/refs/astro"
+;;         bibtex-completion-pdf-field "file"
+;;         ;; bibtex-completion-pdf-opn-function
+;;         ;; (lambda (fpath)
+;;         ;;   (call-process "open" nil 0 nil fpath)))
+;;         ))
+;; (use-package org-roam-bibtex
+;;   :ensure t
+;;   :after org-roam
+;;   :config
+;;   (require 'org-ref))
