@@ -162,6 +162,20 @@
      (append (default-value 'flycheck-disabled-checkers)
              '(c/c++-clang c/c++-gcc c/c++-cppcheck)))))
 
+(require-package 'cape)
+;; (require-package 'company)
+;; (require-package 'company-ctags)
+;; (company-ctags-auto-setup)
+;; (add-to-list 'completion-at-point-functions
+;;              (cape-company-to-capf #'company-ctags))
+
+(advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
+
+(require-package 'citre)
+(require 'citre-config)
+;; (require 'citre)
+;; (require 'citre-config)
+
 (when (featurep 'init-treesitter)
   (add-hook 'c++-ts-mode-hook 'eglot-ensure)
   (add-hook 'c-ts-mode-hook 'eglot-ensure))
@@ -227,9 +241,9 @@
   (setq read-process-output-max (* 1024 1024))
   ;; HOLD: https://github.com/joaotavora/eglot/issues/884
   :config
-  (setq eglot-stay-out-of '(company)
-        eglot-connect-timeout 10
-        eglot-ignored-server-capabilities nil)
+  ;; (setq eglot-stay-out-of '(company)
+  ;;       eglot-connect-timeout 10
+  ;;       eglot-ignored-server-capabilities nil)
 
   (add-to-list 'eglot-server-programs
                `((python-mode python-ts-mode) . ,(eglot-alternatives
@@ -248,21 +262,21 @@
                  (not (buffer-modified-p)))
             (flymake-start t)))))
 
-  (when (fboundp #'tabnine-completion-at-point)
-    (add-hook 'eglot-managed-mode-hook
-              (defun eglot-capf ()
-                (remove-hook 'completion-at-point-functions #'eglot-completion-at-point t)
-                (add-hook 'completion-at-point-functions
-                          (cape-capf-super
-                           #'eglot-completion-at-point
-                           #'tabnine-completion-at-point) nil t))))
+  ;; (when (fboundp #'tabnine-completion-at-point)
+  ;;   (add-hook 'eglot-managed-mode-hook
+  ;;             (defun eglot-capf ()
+  ;;               (remove-hook 'completion-at-point-functions #'eglot-completion-at-point t)
+  ;;               (add-hook 'completion-at-point-functions
+  ;;                         (cape-capf-super
+  ;;                          #'eglot-completion-at-point
+  ;;                          #'tabnine-completion-at-point) nil t))))
 
   (define-fringe-bitmap 'blank-fringe [0] 1 1 'center)
   (add-hook 'eglot-managed-mode-hook
             (defun inhibit-flymake-bitmap ()
               (put 'eglot-note 'flymake-bitmap '(blank-fringe))))
 
-  (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
+  ;; (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
 
   (defun expand-absolute-name (name)
     (if (file-name-absolute-p name)
