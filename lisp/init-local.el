@@ -74,7 +74,7 @@
     (setq org-default-notes-file (expand-file-name "org/inbox.org"))
     (setq org-refile-targets (list `(,(expand-file-name "org/gtd.org") :maxlevel . 3)
                                    `(,(expand-file-name "org/someday.org") :level . 1)
-                                   `(,(expand-file-name "org/notes.org") :level . 2)
+                                   `(,(expand-file-name "org/notes.org") :level . 1)
                                    `(,(expand-file-name "org/tickler.org") :maxlevel . 2)))
     (setq org-agenda-files `(,(expand-file-name "org/inbox.org") ,(expand-file-name "org/gtd.org")))
     (setq org-directory (expand-file-name "org/"))
@@ -84,11 +84,30 @@
                              ,(expand-file-name "org/gtd.org")))
     (setq org-mobile-inbox-for-pull (expand-file-name "mobileorg/inbox.org"))
     (setq org-mobile-directory (expand-file-name "mobileorg/"))
+    ;; Don’t show planning info for DONE items in the agenda
+    (setq org-agenda-skip-deadline-if-done t
+          org-agenda-skip-scheduled-if-done t
+          org-agenda-skip-timestamp-if-done t)
     (with-eval-after-load 'projectile-mode-hook
       (add-to-list 'projectile-globally-ignored-directories
                    (list `(,(expand-file-name "org/") ,(expand-file-name "mobileorg/")))))))
 
 ;; (setup-org (concat yz/my-home-dir "/Koofr/"))
+(setup-org yz/my-home-dir)
+
+
+;;; disable annoying completion-at-point-functions
+(setq-default completion-at-point-functions nil)
+
+
+(use-package org-journal
+  :ensure t
+  :after org
+  :custom
+  (org-element-use-cache nil)
+  (org-journal-dir (expand-file-name "org/journal/" yz/my-home-dir))
+  (org-journal-file-type 'weekly))
+
 
 ;;; A package that create table of contents
 ;;; https://github.com/alphapapa/org-make-toc
@@ -173,8 +192,6 @@
 
 (require-package 'citre)
 (require 'citre-config)
-;; (require 'citre)
-;; (require 'citre-config)
 
 (when (featurep 'init-treesitter)
   (add-hook 'c++-ts-mode-hook 'eglot-ensure)
@@ -187,6 +204,7 @@
 ;;; https://stackoverflow.com/a/56206909
 (setq evil-disable-insert-state-bindings t)
 (evil-mode 1)
+(add-hook 'special-mode-hook #'evil-emacs-state)
 
 (with-eval-after-load 'evil
   ;;; normal state
@@ -320,7 +338,42 @@
 ;; TRAMP
 (use-package tramp
   :config
-  (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+  (add-to-list 'tramp-connection-properties
+               (list (regexp-quote "/scpx:yousen@dekstop:")
+                     "remote-shell" "/bin/bash")))
+
+(use-package cdlatex
+  :ensure t)
+(use-package evil-tex
+  :ensure t)
+(use-package evil-surround
+  :ensure t
+  :config
+  (global-evil-surround-mode 1))
+
+(use-package auctex
+  :ensure t
+  :config
+  (setq TeX-auto-save t)
+  (setq TeX-parse-self t)
+  (setq-default TeX-master nil)
+  (setq TeX-PDF-mode t)
+  (setq TeX-source-correlate-start-server t)
+  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
+  (add-hook 'LaTeX-mode-hook 'turn-on-cdlatex)
+  (add-hook 'LaTeX-mode-hook 'prettify-symbols-mode)
+  (add-hook 'LaTeX-mode-hook #'evil-tex-mode)
+  (setq prettify-symbols-unprettify-at-point t)
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+              (setq TeX-view-program-selection
+                    '((output-pdf "PDF Tools"))
+                    TeX-source-correlate-method 'synctex
+                    TeX-view-program-list
+                    '(("PDF Tools" TeX-pdf-tools-sync-view)))))
+  (pdf-tools-install)
+  (add-to-list 'auto-mode-alist '("\\.tex\\'" . LaTeX-mode)))
 
 ;;; AI tools
 (require 'init-aitools)
@@ -441,6 +494,19 @@
   :after citar embark
   :no-require
   :config (citar-embark-mode))
+
+;;; https://github.com/wasamasa/nov.el
+;;; git clone https://depp.brause.cc/nov.el.git
+;;; git clone https://github.com/tali713/esxml.git
+(require 'esxml-query)
+(use-package nov
+  :init
+  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+  :hook
+  (nov-mode . visual-line-mode))
+
+;;; alternative to C-s C-o which invokes occur in isearch-mode
+(define-key isearch-mode-map (kbd "C-l") #'consult-line)
 
 
 (provide 'init-local)
