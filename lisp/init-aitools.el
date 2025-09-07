@@ -62,10 +62,11 @@
   )
 
 ;;; copilot-chat
-(require-package 'copilot-chat)
-(global-set-key (kbd "C-c C-y") #'copilot-chat-yank)
-(global-set-key (kbd "C-c M-y") #'copilot-chat-yank-pop)
-(global-set-key (kbd "C-c C-M-y") #'(lambda () (interactive) (copilot-chat-yank-pop -1)))
+;;; does it only work under emacs 30?
+;; (require-package 'copilot-chat)
+;; (global-set-key (kbd "C-c C-y") #'copilot-chat-yank)
+;; (global-set-key (kbd "C-c M-y") #'copilot-chat-yank-pop)
+;; (global-set-key (kbd "C-c C-M-y") #'(lambda () (interactive) (copilot-chat-yank-pop -1)))
 
 
 ;;; In the future, I want to try:

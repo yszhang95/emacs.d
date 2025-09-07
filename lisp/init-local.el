@@ -509,6 +509,19 @@
 (define-key isearch-mode-map (kbd "C-l") #'consult-line)
 
 
+;;; eat-mode
+;;; https://codeberg.org/akib/emacs-eat/issues/167#issuecomment-2078683
+;;; I used macports so the tic points to /opt/local/bin/tic.
+;;; I should use /usr/bin/tic to avoid the error, under macos and emacs-mac-app.
+(use-package eat
+  :ensure t
+  :config
+  (with-eval-after-load 'evil
+    (evil-set-initial-state 'eat-mode 'emacs))
+  (with-eval-after-load 'evil-escape
+    (add-hook 'eat-mode-hook (lambda () (setq-local evil-escape-inhibit t)))))
+
+
 (provide 'init-local)
 ;;; init-local.el ends here
 
