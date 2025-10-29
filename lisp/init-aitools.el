@@ -44,7 +44,7 @@
 (setq aidermacs-default-model "github_copilot/gpt-4.1")
 (setq aidermacs-architect-model "github_copilot/gpt-4o")
 (setq aidermacs-default-chat-mode 'architect)
-(global-set-key (kbd "C-c C-a") #'aidermacs-transient-menu)
+;;; (global-set-key (kbd "C-c C-a") #'aidermacs-transient-menu)
 
 ;; Copilot
 (require-package 'copilot)
@@ -57,7 +57,8 @@
 (with-eval-after-load 'copilot
   (define-key copilot-mode-map (kbd "C-<tab>" )
               #'copilot-accept-completion)
-  (setq copilot-idle-delay 0.5)
+  (setq copilot-idle-delay 0.5
+        copilot-indent-offset-warning-disable t)
   ;; (setq copilot-lsp-settings '(:github (:copilot (:selectedCompletionModel "o4-mini"))))
   )
 
@@ -74,6 +75,15 @@
 ;;; - https://github.com/stevemolitor/claude-code.el
 ;;; - https://github.com/cpoile/claudemacs
 
+(use-package ai-code-interface
+  :vc (:url "https://github.com/tninja/ai-code-interface.el")
+  :config
+  (ai-code-set-backend  'codex) ;; use claude-code-ide as backend
+  ;; Enable global keybinding for the main menu
+  (global-set-key (kbd "C-c C-a") #'ai-code-menu)
+  ;; Optional: Set up Magit integration for AI commands in Magit popups
+  (with-eval-after-load 'magit
+    (ai-code-magit-setup-transients)))
 
 (provide 'init-aitools)
 ;;; init-aitools.el ends here

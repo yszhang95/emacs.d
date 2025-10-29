@@ -8,8 +8,18 @@
   (setq yz/my-home-dir (substitute-in-file-name "$HOME"))
   (when (eq system-type 'windows-nt)
     (setq yz/my-home-dir (replace-regexp-in-string "\\\\AppData.*" "" yz/my-home-dir))
-    )
-  )
+    ))
+
+(use-package clipetty
+  :ensure t
+  :hook (after-init . global-clipetty-mode))
+
+;;; clipboard for emacs-pgtk on wsl2
+(use-package xclip
+  :ensure t
+  :config (xclip-mode 1))
+;;; https://www.lukas-barth.net/blog/emacs-wsl-copy-clipboard/
+(setq select-active-regions nil)
 
 ;;; special setup on Windows64
 ;;; msys64 has been installed
@@ -139,6 +149,26 @@
 (add-hook 'python-base-mode-hook 'code-cells-mode-maybe)
 (require 'ox-ipynb)
 
+;; # In bash,
+;; pip install jupyter_ascending &&
+;; python3 -m jupyter nbextension    install jupyter_ascending --sys-prefix --py && \
+;; python3 -m jupyter nbextension     enable jupyter_ascending --sys-prefix --py && \
+;; python3 -m jupyter serverextension enable jupyter_ascending --sys-prefix --py
+;; # There is also a discussion in https://github.com/imbue-ai/jupyter_ascending/issues/62
+(use-package jupyter-ascending
+  :ensure t
+  :hook (python-mode . (lambda ()
+                         (when (and buffer-file-name
+                                    (string-match-p "\\.sync\\.py\\'" buffer-file-name))
+                           (jupyter-ascending-mode 1))))
+  :bind (:map jupyter-ascending-mode-map
+              ("C-c C-k" . jupyter-ascending-execute-line)
+              ("C-c C-a" . jupyter-ascending-execute-all)
+              ("C-c C-n" . jupyter-ascending-next-cell)
+              ("C-c C-p" . jupyter-ascending-previous-cell)
+              ("C-c t" . jupyter-ascending-cycle-cell-type)
+              ("C-c '" . jupyter-ascending-edit-markdown-cell)))
+
 ;; Compute current Python interpreter (from PATH, direnv, uv, etc.)
 ;; https://github.com/python-lsp/python-lsp-server/issues/29#issuecomment-882161177
 ;; (setq-default eglot-workspace-configuration
@@ -200,54 +230,54 @@
 (setq c-block-comment-prefix "* ")
 
 ;; Enable Evil
-(require-package 'evil)
+;; (require-package 'evil)
 ;;; https://stackoverflow.com/a/56206909
-(setq evil-disable-insert-state-bindings t)
-(evil-mode 1)
-(add-hook 'special-mode-hook #'evil-emacs-state)
+;; (setq evil-disable-insert-state-bindings t)
+;; (evil-mode 1)
+;; (add-hook 'special-mode-hook #'evil-emacs-state)
 
-(with-eval-after-load 'evil
-  ;;; normal state
-  (define-key evil-normal-state-map (kbd "C-n") nil)
-  (define-key evil-normal-state-map (kbd "C-p") nil)
-  (define-key evil-normal-state-map (kbd "C-t") nil)
-  ;;; motion state
-  (define-key evil-motion-state-map (kbd "C-d") nil)
-  (define-key evil-motion-state-map (kbd "C-b") nil)
-  (define-key evil-motion-state-map (kbd "C-e") nil)
-  (define-key evil-motion-state-map (kbd "C-f") nil)
-  (define-key evil-motion-state-map (kbd "C-y") nil)
-  (define-key evil-motion-state-map (kbd "C-v") 'evil-scroll-down)
-  (define-key evil-motion-state-map (kbd "M-v") 'evil-scroll-up)
-  (define-key evil-motion-state-map (kbd ",") nil) ;; unbind existing command
-  (evil-set-leader 'normal (kbd ","))  ; Set leader to Space
-  (evil-define-key 'normal 'global (kbd "<leader>v") #'evil-visual-block))
+;; (with-eval-after-load 'evil
+;;   ;;; normal state
+;;   (define-key evil-normal-state-map (kbd "C-n") nil)
+;;   (define-key evil-normal-state-map (kbd "C-p") nil)
+;;   (define-key evil-normal-state-map (kbd "C-t") nil)
+;;   ;;; motion state
+;;   (define-key evil-motion-state-map (kbd "C-d") nil)
+;;   (define-key evil-motion-state-map (kbd "C-b") nil)
+;;   (define-key evil-motion-state-map (kbd "C-e") nil)
+;;   (define-key evil-motion-state-map (kbd "C-f") nil)
+;;   (define-key evil-motion-state-map (kbd "C-y") nil)
+;;   (define-key evil-motion-state-map (kbd "C-v") 'evil-scroll-down)
+;;   (define-key evil-motion-state-map (kbd "M-v") 'evil-scroll-up)
+;;   (define-key evil-motion-state-map (kbd ",") nil) ;; unbind existing command
+;;   (evil-set-leader 'normal (kbd ","))  ; Set leader to Space
+;;   (evil-define-key 'normal 'global (kbd "<leader>v") #'evil-visual-block))
 
 
-(defun my-org-fill-paragraph (&optional justify)
-  "Custom `fill-paragraph` function for Org-mode.
-   - Skips filling paragraphs containing multi-line LaTeX math (`\\[ ... \\]`).
-   - Allows `M-q` to work normally on text and inline math (`\\(...\\)`)."
-  (interactive "P")
-  (let ((start (save-excursion (backward-paragraph) (point)))
-        (end (save-excursion (forward-paragraph) (point)))
-        block-math-found)
-    (save-excursion
-      (goto-char start)
-      ;; Detect `\[ ... \]` blocks spanning multiple lines
-      (while (re-search-forward "^\\\\\\[" end t)
-        (if (re-search-forward "^\\\\\\]" end t)
-            (setq block-math-found t))))
+;; (defun my-org-fill-paragraph (&optional justify)
+;;   "Custom `fill-paragraph` function for Org-mode.
+;;    - Skips filling paragraphs containing multi-line LaTeX math (`\\[ ... \\]`).
+;;    - Allows `M-q` to work normally on text and inline math (`\\(...\\)`)."
+;;   (interactive "P")
+;;   (let ((start (save-excursion (backward-paragraph) (point)))
+;;         (end (save-excursion (forward-paragraph) (point)))
+;;         block-math-found)
+;;     (save-excursion
+;;       (goto-char start)
+;;       ;; Detect `\[ ... \]` blocks spanning multiple lines
+;;       (while (re-search-forward "^\\\\\\[" end t)
+;;         (if (re-search-forward "^\\\\\\]" end t)
+;;             (setq block-math-found t))))
 
-    (if block-math-found
-        ;; Do nothing if multi-line block math is found, preserving formatting
-        nil
-      ;; Otherwise, fill the paragraph normally
-      (org-fill-paragraph justify))))
+;;     (if block-math-found
+;;         ;; Do nothing if multi-line block math is found, preserving formatting
+;;         nil
+;;       ;; Otherwise, fill the paragraph normally
+;;       (org-fill-paragraph justify))))
 
-(add-hook 'org-mode-hook
-          (lambda ()
-            (setq-local fill-paragraph-function #'my-org-fill-paragraph)))
+;; (add-hook 'org-mode-hook
+;;           (lambda ()
+;;             (setq-local fill-paragraph-function #'my-org-fill-paragraph)))
 
 
 ;;; copied from https://github.com/tshu-w/.emacs.d/blob/9692c7d/lisp/editor-completion.el#L375
@@ -345,12 +375,12 @@
 
 (use-package cdlatex
   :ensure t)
-(use-package evil-tex
-  :ensure t)
-(use-package evil-surround
-  :ensure t
-  :config
-  (global-evil-surround-mode 1))
+;; (use-package evil-tex
+;;   :ensure t)
+;; (use-package evil-surround
+;;   :ensure t
+;;   :config
+;;   (global-evil-surround-mode 1))
 
 (use-package auctex
   :ensure t
@@ -363,7 +393,7 @@
   (add-hook 'LaTeX-mode-hook 'flyspell-mode)
   (add-hook 'LaTeX-mode-hook 'turn-on-cdlatex)
   (add-hook 'LaTeX-mode-hook 'prettify-symbols-mode)
-  (add-hook 'LaTeX-mode-hook #'evil-tex-mode)
+  ;; (add-hook 'LaTeX-mode-hook #'evil-tex-mode)
   (setq prettify-symbols-unprettify-at-point t)
   (add-hook 'LaTeX-mode-hook
             (lambda ()
