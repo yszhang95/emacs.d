@@ -2,6 +2,9 @@
 ;;; Commentary:
 ;;; Code:
 
+(use-package diff-hl
+  :vc (:url "https://github.com/dgutov/diff-hl.git"))
+
 (global-set-key (kbd "C-x 0") 'switch-window-then-delete)
 
 (progn
@@ -144,30 +147,32 @@
 ;;; I am forced to use "C-c '" in org-mode to edit the jupyter source block,
 ;;; https://github.com/emacs-jupyter/jupyter/issues/488.
 ;;; https://github.com/emacs-jupyter/jupyter/issues/478#issuecomment-1676442126
+;;; I prefer to use paired mode and edit .py file.
 (require-package 'jupyter)
 (require-package 'code-cells)
 (add-hook 'python-base-mode-hook 'code-cells-mode-maybe)
 (require 'ox-ipynb)
 
+;;; This on ly works for old jupyter notebook, not jupyter lab, not new jupyter notebook
 ;; # In bash,
 ;; pip install jupyter_ascending &&
 ;; python3 -m jupyter nbextension    install jupyter_ascending --sys-prefix --py && \
 ;; python3 -m jupyter nbextension     enable jupyter_ascending --sys-prefix --py && \
 ;; python3 -m jupyter serverextension enable jupyter_ascending --sys-prefix --py
 ;; # There is also a discussion in https://github.com/imbue-ai/jupyter_ascending/issues/62
-(use-package jupyter-ascending
-  :ensure t
-  :hook (python-mode . (lambda ()
-                         (when (and buffer-file-name
-                                    (string-match-p "\\.sync\\.py\\'" buffer-file-name))
-                           (jupyter-ascending-mode 1))))
-  :bind (:map jupyter-ascending-mode-map
-              ("C-c C-k" . jupyter-ascending-execute-line)
-              ("C-c C-a" . jupyter-ascending-execute-all)
-              ("C-c C-n" . jupyter-ascending-next-cell)
-              ("C-c C-p" . jupyter-ascending-previous-cell)
-              ("C-c t" . jupyter-ascending-cycle-cell-type)
-              ("C-c '" . jupyter-ascending-edit-markdown-cell)))
+;; (use-package jupyter-ascending
+;;   :ensure t
+;;   :hook (python-mode . (lambda ()
+;;                          (when (and buffer-file-name
+;;                                     (string-match-p "\\.sync\\.py\\'" buffer-file-name))
+;;                            (jupyter-ascending-mode 1))))
+;;   :bind (:map jupyter-ascending-mode-map
+;;               ("C-c C-k" . jupyter-ascending-execute-line)
+;;               ("C-c C-a" . jupyter-ascending-execute-all)
+;;               ("C-c C-n" . jupyter-ascending-next-cell)
+;;               ("C-c C-p" . jupyter-ascending-previous-cell)
+;;               ("C-c t" . jupyter-ascending-cycle-cell-type)
+;;               ("C-c '" . jupyter-ascending-edit-markdown-cell)))
 
 ;; Compute current Python interpreter (from PATH, direnv, uv, etc.)
 ;; https://github.com/python-lsp/python-lsp-server/issues/29#issuecomment-882161177

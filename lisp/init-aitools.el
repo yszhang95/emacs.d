@@ -31,7 +31,7 @@
               nous-hermes2:10.7b-solar-q4_0)))
 
 ;;; aidermacs
-(require-package 'aidermacs)
+;; (require-package 'aidermacs)
 ;; (setq aidermacs-default-chat-mode "ollama_chat/gemma3:4b")
 ;; (setq aidermacs-default-model "ollama_chat/gemma3:12b")
 ;; (setq aidermacs-architect-model "ollama_chat/gemma3:12b")
@@ -40,10 +40,10 @@
 ;;; This solution works by upgrading litellm to 1.74.
 ;;; https://github.com/MatthewZMD/aidermacs/issues/127
 ;;; not working as of 2025-07-30
-(setq aidermacs-default-chat-mode "github_copilot/gpt-4o")
-(setq aidermacs-default-model "github_copilot/gpt-4.1")
-(setq aidermacs-architect-model "github_copilot/gpt-4o")
-(setq aidermacs-default-chat-mode 'architect)
+;; (setq aidermacs-default-chat-mode "github_copilot/gpt-4o")
+;; (setq aidermacs-default-model "github_copilot/gpt-4.1")
+;; (setq aidermacs-architect-model "github_copilot/gpt-4o")
+;; (setq aidermacs-default-chat-mode 'architect)
 ;;; (global-set-key (kbd "C-c C-a") #'aidermacs-transient-menu)
 
 ;; Copilot
@@ -51,9 +51,9 @@
 (add-hook 'prog-mode-hook #'copilot-mode)
 (add-hook 'cbase-mode-hook #'copilot-mode)
 (add-hook 'python-base-mode-hook #'copilot-mode)
-;; (setq copilot-network-proxy '(:host "127.0.0.1" :port 11435 :rejectUnauthorized :json-false))
-;; (setq copilot-lsp-settings
-;;       '(:http (:proxy "http://127.0.0.1:11435" :proxyStrictSSL :json-false)))
+;; ;; (setq copilot-network-proxy '(:host "127.0.0.1" :port 11435 :rejectUnauthorized :json-false))
+;; ;; (setq copilot-lsp-settings
+;; ;;       '(:http (:proxy "http://127.0.0.1:11435" :proxyStrictSSL :json-false)))
 (with-eval-after-load 'copilot
   (define-key copilot-mode-map (kbd "C-<tab>" )
               #'copilot-accept-completion)
