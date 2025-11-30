@@ -556,6 +556,41 @@
   (with-eval-after-load 'evil-escape
     (add-hook 'eat-mode-hook (lambda () (setq-local evil-escape-inhibit t)))))
 
+;;; auto export org to html on save
+(defvar yz/report-temp-dir "/tmp/org-reports/"
+  "Directory to store generated HTML reports.")
+
+(defun yz/export-html-to-temp ()
+  "Export the current Org buffer to the temporary directory as HTML."
+  (interactive)
+  ;; 1. Ensure the temp directory exists
+  (unless (file-exists-p yz/report-temp-dir)
+    (make-directory yz/report-temp-dir t))
+
+  ;; 2. Calculate the target filename (e.g., /tmp/org-reports/f.html)
+  (let ((output-file (concat (file-name-as-directory yz/report-temp-dir)
+                             (file-name-base (buffer-file-name))
+                             ".html")))
+    ;; 3. Export specifically to that file
+    (org-export-to-file 'html output-file)
+    (message "Report updated: %s" output-file)))
+
+(define-minor-mode yz/auto-report-mode
+  "Automatically export to temp HTML on save."
+  :lighter " AutoReport"
+  (if yz/auto-report-mode
+      (add-hook 'after-save-hook #'yz/export-html-to-temp nil t)
+    (remove-hook 'after-save-hook #'yz/export-html-to-temp t)))
+
+;; Mintty sends ESC [ I for Ctrl+Tab
+(define-key input-decode-map "\e[I" [C-tab])
+
+;; Mintty sends ESC [ O for Ctrl+Shift+Tab (if needed)
+(define-key input-decode-map "\e[O" [C-S-tab])
+
+(define-key input-decode-map "\e[1;5l" (kbd "C-,"))
+
+(setq python-indent-offset 4)
 
 (provide 'init-local)
 ;;; init-local.el ends here
