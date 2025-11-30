@@ -184,8 +184,28 @@
 ;;                  ;; optional: mypy via pylsp-mypy
 ;;                  (:mypy (:enabled t :live_mode t :dmypy t)))))
 
+(defun yz/temp-file-directory-from-env-per-buffer ()
+  "Set temporary-file-directory from env TMPDIR/TEMP/TMP/TEMPDIR per buffer."
+  (message "Setting temporary-file-directory from env for buffer.")
+  (setq-local temporary-file-directory
+              (or (getenv "ORG_TEMP_DIR")
+                  (getenv "TEMPDIR")
+                  (getenv "TEMP")
+                  (getenv "TMP")
+                  (getenv "TMPDIR")
+                  temporary-file-directory)))
+
+;;; when exiting the code block with C-c ', there must be at least one source block below it.
+;;; Otherwise, the content at the end is lost when exiting the special edit buffer.
+;;; eglot can only work when it is already working under other .py for the project.
+(use-package org-src-context
+  :vc (:url "https://github.com/karthink/org-src-context.git")
+  :after org
+  :config
+  (add-hook 'org-mode-hook #'org-src-context-mode)
+  (add-hook 'org-src-mode-hook #'yz/temp-file-directory-from-env-per-buffer))
+
 (with-eval-after-load 'org
-  (require 'ob-jupyter)
   (add-to-list 'org-babel-load-languages '(jupyter . t) t)
   (org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)
   (add-hook 'org-babel-after-execute-hook 'org-display-inline-images))
@@ -200,7 +220,7 @@
         (:cache .   "no")
         (:noweb . "no")
         (:hlines . "no")
-        (:tangle . "no")
+        ;; (:tangle . "no")
         (:eval . "never-export")))
 
 ;;; automatically enable eglot in C/C++, python
