@@ -75,6 +75,8 @@
 ;;; - https://github.com/stevemolitor/claude-code.el
 ;;; - https://github.com/cpoile/claudemacs
 
+(use-package claude-code :ensure t
+  :vc (:url "https://github.com/stevemolitor/claude-code.el" :rev :newest))
 (use-package ai-code-interface
   :vc (:url "https://github.com/tninja/ai-code-interface.el")
   :config
