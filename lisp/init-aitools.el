@@ -51,6 +51,7 @@
 (add-hook 'prog-mode-hook #'copilot-mode)
 (add-hook 'cbase-mode-hook #'copilot-mode)
 (add-hook 'python-base-mode-hook #'copilot-mode)
+(add-hook 'python-mode-hook #'copilot-mode)
 ;; ;; (setq copilot-network-proxy '(:host "127.0.0.1" :port 11435 :rejectUnauthorized :json-false))
 ;; ;; (setq copilot-lsp-settings
 ;; ;;       '(:http (:proxy "http://127.0.0.1:11435" :proxyStrictSSL :json-false)))
@@ -60,7 +61,8 @@
   (setq copilot-idle-delay 0.5
         copilot-indent-offset-warning-disable t)
   ;; (setq copilot-lsp-settings '(:github (:copilot (:selectedCompletionModel "o4-mini"))))
-  )
+  (add-to-list 'copilot-major-mode-alist '("python-ts" . "python"))
+  (add-to-list 'copilot-major-mode-alist '("jupyter-python" . "python")))
 
 ;;; copilot-chat
 ;;; does it only work under emacs 30?

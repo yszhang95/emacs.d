@@ -587,13 +587,27 @@
   (unless (file-exists-p yz/report-temp-dir)
     (make-directory yz/report-temp-dir t))
 
-  ;; 2. Calculate the target filename (e.g., /tmp/org-reports/f.html)
-  (let ((output-file (concat (file-name-as-directory yz/report-temp-dir)
-                             (file-name-base (buffer-file-name))
-                             ".html")))
-    ;; 3. Export specifically to that file
-    (org-export-to-file 'html output-file)
-    (message "Report updated: %s" output-file)))
+  ;; 1.5. Ensure .ob-ipython is available in the temp dir (via symlink)
+  (let* ((src-dir (file-name-directory (buffer-file-name)))
+         (src-ob  (expand-file-name ".ob-jupyter" src-dir))
+         (dst-ob  (expand-file-name ".ob-jupyter" yz/report-temp-dir)))
+    (message "src-dir = %s" src-dir)
+    (message "src-ob  = %s" src-ob)
+    (message "dst-ob  = %s" dst-ob)
+    (when (file-directory-p src-ob)
+      (message ".ob-ipython found in source dir")
+      (unless (file-exists-p dst-ob)
+        (message "Symlink for .ob-ipython not found in temp dir")
+        (message "Creating symlink for .ob-ipython in temp dir")
+        (make-symbolic-link src-ob dst-ob t)))
+
+    ;; 2. Calculate the target filename (e.g., /tmp/org-reports/f.html)
+    (let ((output-file (concat (file-name-as-directory yz/report-temp-dir)
+                               (file-name-base (buffer-file-name))
+                               ".html")))
+      ;; 3. Export specifically to that file
+      (org-export-to-file 'html output-file)
+      (message "Report updated: %s" output-file))))
 
 (define-minor-mode yz/auto-report-mode
   "Automatically export to temp HTML on save."
