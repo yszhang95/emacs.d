@@ -44,9 +44,8 @@
 (defun is-wsl ()
   "Check if it is WSL distributions via the environment variable PATH"
   ;; convert to t or nil
-  (not (not
-        (string-match "MicrosoftCorporationII.WindowsSubsystemForLinux"
-                      (getenv "PATH")))))
+  (not (not (string-match "c/WINDOWS/System32" (getenv "PATH")))))
+
 (when (is-wsl)
   (set-face-attribute 'default nil :family "Source Han Mono" :height 120)
   )
