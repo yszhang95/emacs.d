@@ -617,11 +617,55 @@
 
 ;; Mintty sends ESC [ I for Ctrl+Tab
 (define-key input-decode-map "\e[I" [C-tab])
+(define-key input-decode-map "\e[1;5I" [C-tab])
+
 
 ;; Mintty sends ESC [ O for Ctrl+Shift+Tab (if needed)
 (define-key input-decode-map "\e[O" [C-S-tab])
 
 (define-key input-decode-map "\e[1;5l" (kbd "C-,"))
+
+(defvar super-mode-map
+  (make-keymap))
+
+(defun esc-map->super-map ()
+  (map-keymap
+   (lambda (key cmd)
+     (ignore-errors    ; Replace `ignore-errors' with `demoted-errors'
+       (let ((key-desc (single-key-description key)))
+         ;; (message "%s\t\t\t%S" (format "s-%s" key-desc) cmd)
+         (define-key super-mode-map (kbd (format "s-%s" key-desc)) cmd))))
+   esc-map ; `M-` keybindings are from this map
+   ))
+
+(define-minor-mode super-mode
+  "Super Mode."
+  :lighter " Super."
+  :keymap super-mode-map
+  (esc-map->super-map))
+
+(defun super-mode--turn-on ()
+  (when (not super-mode)
+    (super-mode 1)))
+
+(defun super-mode--turn-off ()
+  (when super-mode
+    (super-mode -1)))
+
+(define-globalized-minor-mode global-super-mode
+  super-mode super-mode--turn-on)
+
+(global-super-mode)
+(use-package kkp
+  :ensure t
+  :config
+  (global-kkp-mode 1)
+  )
+(use-package kkp
+  :ensure t
+  :config
+  (global-kkp-mode 1)
+  )
 
 (setq python-indent-offset 4)
 
