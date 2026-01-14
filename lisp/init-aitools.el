@@ -61,8 +61,11 @@
   (setq copilot-idle-delay 0.5
         copilot-indent-offset-warning-disable t)
   ;; (setq copilot-lsp-settings '(:github (:copilot (:selectedCompletionModel "o4-mini"))))
+
   (add-to-list 'copilot-major-mode-alist '("python-ts" . "python"))
-  (add-to-list 'copilot-major-mode-alist '("jupyter-python" . "python")))
+  (add-to-list 'copilot-major-mode-alist '("jupyter-python" . "python"))
+  (when (eq system-type 'windows-nt)
+    (setq copilot-server-executable "c://msys64/mingw64/lib/node_modules/@github/copilot-language-server/node_modules/@github/copilot-language-server-win32-x64/copilot-language-server.exe")))
 
 ;;; copilot-chat
 ;;; does it only work under emacs 30?
@@ -78,7 +81,7 @@
 ;;; - https://github.com/cpoile/claudemacs
 
 (use-package claude-code :ensure t
-  :vc (:url "https://github.com/stevemolitor/claude-code.el" :rev :newest))
+  :vc (:url "https://github.com/stevemolitor/claude-code.el" ))
 (use-package ai-code-interface
   :vc (:url "https://github.com/tninja/ai-code-interface.el")
   :config

@@ -18,9 +18,9 @@
   :hook (after-init . global-clipetty-mode))
 
 ;;; clipboard for emacs-pgtk on wsl2
-(use-package xclip
-  :ensure t
-  :config (xclip-mode 1))
+;; (use-package xclip
+;;   :ensure t
+;;   :config (xclip-mode 1))
 ;;; https://www.lukas-barth.net/blog/emacs-wsl-copy-clipboard/
 (setq select-active-regions nil)
 
@@ -150,7 +150,9 @@
 (require-package 'jupyter)
 (require-package 'code-cells)
 (add-hook 'python-base-mode-hook 'code-cells-mode-maybe)
-(require 'ox-ipynb)
+(use-package ox-ipynb
+  :vc (:url "https://github.com/jkitchin/ox-ipynb.git")
+  :ensure t)
 
 ;;; This on ly works for old jupyter notebook, not jupyter lab, not new jupyter notebook
 ;; # In bash,
@@ -419,14 +421,6 @@
   (add-hook 'LaTeX-mode-hook 'prettify-symbols-mode)
   ;; (add-hook 'LaTeX-mode-hook #'evil-tex-mode)
   (setq prettify-symbols-unprettify-at-point t)
-  (add-hook 'LaTeX-mode-hook
-            (lambda ()
-              (setq TeX-view-program-selection
-                    '((output-pdf "PDF Tools"))
-                    TeX-source-correlate-method 'synctex
-                    TeX-view-program-list
-                    '(("PDF Tools" TeX-pdf-tools-sync-view)))))
-  (pdf-tools-install)
   (add-to-list 'auto-mode-alist '("\\.tex\\'" . LaTeX-mode)))
 
 ;;; AI tools
@@ -440,16 +434,7 @@
                "* %:description\n\n%:link\n\n%:initial"))
 
 
-(require-package 'pdf-tools)
-;;; if not found epdfinfo, do (pdf-tools-install)
-(when (eq system-type 'darwin)  ;; I work with MacPorts
-  ;; Set PKG_CONFIG_PATH for MacPorts
-  (setenv "PKG_CONFIG_PATH"
-          (concat "/opt/local/lib/pkgconfig:"
-                  (or (getenv "PKG_CONFIG_PATH") "")))
-  ;; Install or rebuild pdf-tools
-  (pdf-tools-install))
-(add-to-list 'auto-mode-alist '("\\.pdf\\'" . pdf-view-mode))
+;;; on windows-nt, I do not use pdf-tools
 
 (use-package org-noter
   :ensure t
@@ -460,8 +445,8 @@
 ;;; https://github.com/org-noter/org-noter/issues/100#issuecomment-3161843750
 ;;; https://github.com/org-noter/org-noter?tab=readme-ov-file#customization
   (org-noter-enable-org-roam-integration)
- ;;; https://github.com/org-noter/org-noter/issues/100#issuecomment-3161843750
- ;;; (require 'org-macs)
+;;; https://github.com/org-noter/org-noter/issues/100#issuecomment-3161843750
+;;; (require 'org-macs)
   )
 
 ;;; tested on emacs-mac-app; not official GNU/EMacs
@@ -552,8 +537,10 @@
 ;;; https://github.com/wasamasa/nov.el
 ;;; git clone https://depp.brause.cc/nov.el.git
 ;;; git clone https://github.com/tali713/esxml.git
-(require 'esxml-query)
+(use-package esxml-query
+  :vc (:url "https://github.com/tali713/esxml.git"))
 (use-package nov
+  :vc (:url  "https://depp.brause.cc/nov.el.git")
   :init
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
   :hook
@@ -574,6 +561,30 @@
     (evil-set-initial-state 'eat-mode 'emacs))
   (with-eval-after-load 'evil-escape
     (add-hook 'eat-mode-hook (lambda () (setq-local evil-escape-inhibit t)))))
+
+(use-package vterm
+  :load-path "~/.emacs.d/site-lisp/emacs-libvterm/"
+  :init
+  (with-eval-after-load 'vterm
+    (defun vterm--conpty-proxy-path ()
+      "Path of conpty_proxy.exe.
+If `vterm-conpty-proxy-path' is set, use that value.
+Otherwise, search in PATH for 'conpty_proxy.exe'.
+If not found in PATH, look in the vterm.el directory."
+      (or vterm-conpty-proxy-path
+          (executable-find "conpty_proxy.exe")
+          (expand-file-name "conpty_proxy.exe"
+                            (file-name-directory (locate-library "vterm.el"))))))
+  :config
+  (when (eq system-type 'windows-nt)
+    (setq vterm-shell "powershell")))
+
+(defun yz/shell ()
+  "msys2 bash shell."
+  (interactive)
+  (let ((vterm-shell "c://msys64/msys2_shell.cmd -defterm -here -no-start -mingw64 -i")
+        (vterm-buffer-name "*msys2-bash*"))
+    (call-interactively #'vterm)))
 
 ;;; auto export org to html on save
 (defvar yz/report-temp-dir "/tmp/org-reports/"
@@ -624,6 +635,8 @@
 (define-key input-decode-map "\e[1;5l" (kbd "C-,"))
 
 (setq python-indent-offset 4)
+
+(set-face-attribute 'default nil :font "Consolas-12")
 
 (provide 'init-local)
 ;;; init-local.el ends here
