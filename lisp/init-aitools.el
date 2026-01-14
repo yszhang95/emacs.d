@@ -83,6 +83,7 @@
   :vc (:url "https://github.com/tninja/ai-code-interface.el")
   :config
   (ai-code-set-backend  'codex) ;; use claude-code-ide as backend
+  (setq claude-code-terminal-backend 'vterm)
   ;; Enable global keybinding for the main menu
   (global-set-key (kbd "C-c C-a") #'ai-code-menu)
   ;; Optional: Set up Magit integration for AI commands in Magit popups
