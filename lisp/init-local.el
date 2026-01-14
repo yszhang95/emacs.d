@@ -625,6 +625,23 @@
 
 (setq python-indent-offset 4)
 
+;; I want to google
+(require 'url-util) ;; for url-hexify-string
+
+(defun yz/google (query)
+  "Search Google for QUERY using the OS default browser."
+  (interactive
+   (list
+    (read-string
+     "Google: "
+     (if (use-region-p)
+         (buffer-substring-no-properties (region-beginning) (region-end))
+       (thing-at-point 'symbol t)))))
+  (browse-url
+   (concat "https://www.google.com/search?q="
+           (url-hexify-string query))))
+
+
 (provide 'init-local)
 ;;; init-local.el ends here
 
