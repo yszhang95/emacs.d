@@ -79,7 +79,7 @@
 
 (use-package claude-code :ensure t
   :vc (:url "https://github.com/stevemolitor/claude-code.el" :rev :newest))
-(use-package ai-code-interface
+(use-package ai-code
   :vc (:url "https://github.com/tninja/ai-code-interface.el")
   :config
   (ai-code-set-backend  'codex) ;; use claude-code-ide as backend
@@ -89,6 +89,14 @@
   ;; Optional: Set up Magit integration for AI commands in Magit popups
   (with-eval-after-load 'magit
     (ai-code-magit-setup-transients)))
+
+(use-package acp
+  :vc (:url "https://github.com/xenodium/acp.el.git"))
+(use-package shell-maker
+  :vc (:url "https://github.com/xenodium/shell-maker.git"))
+(use-package agent-shell
+  :ensure t)
+
 
 (provide 'init-aitools)
 ;;; init-aitools.el ends here
