@@ -2,6 +2,9 @@
 ;;; Commentary:
 ;;; Code:
 
+;; https://www.reddit.com/r/emacs/comments/1hayavx/invalid_function_orgelementwithdisabledcache/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+(setq native-comp-jit-compilation-deny-list '(".*org-element.*"))
+
 (use-package diff-hl
   :vc (:url "https://github.com/dgutov/diff-hl.git"))
 
@@ -478,6 +481,18 @@
 (setq-default org-download-heading-lvl 1)
 ;; (setq org-download-method 'attach)
 (setq org-image-actual-width 600)
+(with-eval-after-load 'org
+  (setq org-download-method 'attach)
+  (setq org-attach-id-dir (expand-file-name "data/" org-directory))
+  (defun yz/org-download-ensure-id (&rest _)
+    (when (derived-mode-p 'org-mode)
+      (save-excursion
+        (unless (org-before-first-heading-p)
+          (org-back-to-heading t)
+          (org-id-get-create)))))
+  (advice-add 'org-download-yank :before #'yz/org-download-ensure-id)
+  (advice-add 'org-download-screenshot :before #'yz/org-download-ensure-id))
+
 
 (defun gpt/org-smart-yank-macos ()
   "In Org-mode, paste clipboard image via `org-download-clipboard` if clipboard has image; else, yank text."
