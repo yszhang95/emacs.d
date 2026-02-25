@@ -81,9 +81,9 @@
 ;;; - https://github.com/cpoile/claudemacs
 
 (use-package claude-code :ensure t
-  :vc (:url "https://github.com/stevemolitor/claude-code.el" ))
-(use-package ai-code-interface
-  :vc (:url "https://github.com/tninja/ai-code-interface.el")
+  :vc (:url "https://github.com/stevemolitor/claude-code.el" :rev "latest"))
+(use-package ai-code
+  :vc (:url "https://github.com/tninja/ai-code-interface.el" :rev "latest")
   :config
   (ai-code-set-backend  'codex) ;; use claude-code-ide as backend
   ;; Enable global keybinding for the main menu

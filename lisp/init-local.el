@@ -2,6 +2,9 @@
 ;;; Commentary:
 ;;; Code:
 
+;; https://www.reddit.com/r/emacs/comments/1hayavx/invalid_function_orgelementwithdisabledcache/
+(setq native-comp-jit-compilation-deny-list '(".*org-element.*"))
+
 (use-package diff-hl
   :vc (:url "https://github.com/dgutov/diff-hl.git"))
 
@@ -151,7 +154,7 @@
 (require-package 'code-cells)
 (add-hook 'python-base-mode-hook 'code-cells-mode-maybe)
 (use-package ox-ipynb
-  :vc (:url "https://github.com/jkitchin/ox-ipynb.git")
+  :vc (:url "https://github.com/jkitchin/ox-ipynb.git" :rev "latst")
   :ensure t)
 
 ;;; This on ly works for old jupyter notebook, not jupyter lab, not new jupyter notebook
@@ -461,7 +464,23 @@
   (define-key org-mode-map (kbd "C-M-y") #'org-download-clipboard))
 (setq-default org-download-image-dir (expand-file-name "~/org/images"))
 (setq-default org-download-heading-lvl 1)
-;; (setq org-download-method 'attach)
+(setq org-download-method 'attach)
+
+(setq org-attach-id-dir (expand-file-name "data/" org-directory))
+
+(setq org-attach-method 'cp)
+(with-eval-after-load 'org
+  (setq org-download-method 'attach)
+  (defun yz/org-download-ensure-id (&rest _)
+    (when (derived-mode-p 'org-mode)
+      (save-excursion
+        (when (org-before-first-heading-p)
+          (user-error "Please paste or attach a screenshot (attachment requires a heading) under a headline."))
+        (org-back-to-heading t)
+        (org-id-get-create))))
+  (advice-add 'org-download-yank :before #'yz/org-download-ensure-id)
+  (advice-add 'org-download-screenshot :before #'yz/org-download-ensure-id))
+
 (setq org-image-actual-width 600)
 
 (defun gpt/org-smart-yank-macos ()
