@@ -175,19 +175,20 @@ Insert Original + Version B + Notes into a foldable Org drawer below."
                 (delete-region origin-beg origin-end)
                 (cond
                  ((and a (not (string-empty-p a)))
-                  (insert (string-trim a) "\n\n")
+                  (insert (string-trim a) "\n")
                   (let ((drawer-pos (point)))
                     (insert (my-gptel--make-drawer my-gptel-polish-drawer-name text b n))
                     (my-gptel--fold-ai-block-at drawer-pos))
                   (message "Polish inserted (Version A visible; references folded)."))
                  (t
-                  (insert (string-trim text) "\n\n")
+                  (insert (string-trim text) "\n")
                   (let ((drawer-pos (point)))
                     (insert (my-gptel--make-drawer my-gptel-polish-drawer-name
                                                    text (or b "") (or n "")
                                                    resp))
                     (my-gptel--fold-ai-block-at drawer-pos))
-                  (message "Polish completed, but parsing failed (RAW output saved in drawer).")))))))))))
+                  (message "Polish completed, but parsing failed (RAW output saved in drawer).")))
+                (deactivate-mark)))))))))
 
 
 ;;; aidermacs
