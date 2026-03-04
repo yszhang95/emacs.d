@@ -530,28 +530,7 @@
         org-roam-ui-open-on-start t))
 
 
-(use-package citar
-  :ensure t
-  :custom
-  (citar-bibliography '("~/org/references.bib"))
-  (org-cite-insert-processor 'citar)
-  (org-cite-follow-processor 'citar)
-  (org-cite-activate-processor 'citar)
-  (citar-library-paths '("~/references/"))
-  ;; (citar-bibliography org-cite-global-bibliography)
-  (citar-org-roam-note-title-template "${author} - ${title}\npdf: ${file}")
-  (citar-notes-paths '("~/org/roam/"))
-  :bind
-  (:map org-mode-map :package org ("C-c b" . #'org-cite-insert))
-  :hook
-  (LaTeX-mode . citar-capf-setup)
-  (org-mode . citar-capf-setup))
-
-(use-package citar-embark
-  :ensure t
-  :after citar embark
-  :no-require
-  :config (citar-embark-mode))
+(require 'init-zotero)
 
 ;;; https://github.com/wasamasa/nov.el
 ;;; git clone https://depp.brause.cc/nov.el.git
@@ -668,20 +647,3 @@ If not found in PATH, look in the vterm.el directory."
 
 (provide 'init-local)
 ;;; init-local.el ends here
-
-
-;; (use-package org-ref
-;;   :ensure t
-;;   :config
-;;   (setq bibtex-completion-bibliography '("~/org/references.bib")
-;;         ;; bibtex-completion-notes-path "~/Documents/org/refs/astro"
-;;         bibtex-completion-pdf-field "file"
-;;         ;; bibtex-completion-pdf-opn-function
-;;         ;; (lambda (fpath)
-;;         ;;   (call-process "open" nil 0 nil fpath)))
-;;         ))
-;; (use-package org-roam-bibtex
-;;   :ensure t
-;;   :after org-roam
-;;   :config
-;;   (require 'org-ref))
