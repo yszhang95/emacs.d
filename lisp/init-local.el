@@ -154,7 +154,7 @@
 (require-package 'code-cells)
 (add-hook 'python-base-mode-hook 'code-cells-mode-maybe)
 (use-package ox-ipynb
-  :vc (:url "https://github.com/jkitchin/ox-ipynb.git" :rev "latst")
+  :vc (:url "https://github.com/jkitchin/ox-ipynb.git" :rev "newest")
   :ensure t)
 
 ;;; This on ly works for old jupyter notebook, not jupyter lab, not new jupyter notebook
