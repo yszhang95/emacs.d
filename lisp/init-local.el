@@ -645,14 +645,6 @@ If not found in PATH, look in the vterm.el directory."
       (add-hook 'after-save-hook #'yz/export-html-to-temp nil t)
     (remove-hook 'after-save-hook #'yz/export-html-to-temp t)))
 
-;; Mintty sends ESC [ I for Ctrl+Tab
-(define-key input-decode-map "\e[I" [C-tab])
-
-;; Mintty sends ESC [ O for Ctrl+Shift+Tab (if needed)
-(define-key input-decode-map "\e[O" [C-S-tab])
-
-(define-key input-decode-map "\e[1;5l" (kbd "C-,"))
-
 (setq python-indent-offset 4)
 
 (set-face-attribute 'default nil :font "Consolas-12")
