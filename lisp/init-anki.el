@@ -44,11 +44,11 @@
   ankiorg-buffer-get-media-files
   ankiorg-pull-tags
   :custom
-  (ankiorg-sql-database (concat yz/my-home-dir "/Koofr/anki/collection.anki2"))
-  (ankiorg-media-directory (concat yz/my-home-dir "/Koofr/anki/img")))
+  (ankiorg-sql-database (concat yz/my-home-dir "/anki/collection.anki2"))
+  (ankiorg-media-directory (concat yz/my-home-dir "/anki/img")))
 
 ;; Org-capture templates
-(setq org-my-anki-file (concat yz/my-home-dir "/Koofr/org/anki.org"))
+(setq org-my-anki-file (concat yz/my-home-dir "/org/anki.org"))
 
 (add-to-list 'org-capture-templates
              '("a" "Anki basic"

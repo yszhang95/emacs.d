@@ -89,6 +89,11 @@
                                    `(,(expand-file-name "org/notes.org") :level . 1)
                                    `(,(expand-file-name "org/tickler.org") :maxlevel . 2)))
     (setq org-agenda-files `(,(expand-file-name "org/inbox.org") ,(expand-file-name "org/gtd.org")))
+    ;;; add ~/org/desktop.org to agenda if exists
+    (let ((desktop-file (expand-file-name "org/desktop.org")))
+      (when (file-exists-p desktop-file))
+      (add-to-list 'org-agenda-files desktop-file)
+      (add-to-list 'org-refile-targets `(,(expand-file-name "org/desktop.org") :maxlevel . 2)))
     (setq org-directory (expand-file-name "org/"))
     (setq org-agenda-span 'week)
 ;;; overwrite the default value, (org-agenda-files)
