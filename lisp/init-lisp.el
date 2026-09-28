@@ -9,6 +9,8 @@
   (add-hook hook 'turn-on-elisp-slime-nav-mode))
 (add-hook 'emacs-lisp-mode-hook (lambda () (setq mode-name "ELisp")))
 
+(setq-default elisp-fontify-semantically t)
+
 (setq-default initial-scratch-message
               (concat ";; Happy hacking, " user-login-name " - Emacs ♥ you!\n\n"))
 
@@ -169,6 +171,10 @@ there is no current file, eval the current buffer."
        'shell-quote-argument
        (list "-Q" "-batch" "-f" "batch-byte-compile" filename)
        " ")))))
+
+
+(with-eval-after-load 'page-break-lines
+  (add-to-list 'page-break-lines-modes 'emacs-lisp-compilation-mode))
 
 
 
