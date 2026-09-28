@@ -158,7 +158,10 @@
 (require-package 'jupyter)
 (require-package 'code-cells)
 (add-hook 'python-base-mode-hook 'code-cells-mode-maybe)
-(require 'ox-ipynb)
+(use-package ox-ipynb
+  :vc (:url "https://github.com/jkitchin/ox-ipynb.git"
+       :rev :newest)
+  :after ox)
 
 ;;; This on ly works for old jupyter notebook, not jupyter lab, not new jupyter notebook
 ;; # In bash,
@@ -572,8 +575,13 @@
 ;;; https://github.com/wasamasa/nov.el
 ;;; git clone https://depp.brause.cc/nov.el.git
 ;;; git clone https://github.com/tali713/esxml.git
-(require 'esxml-query)
+(use-package esxml
+  :ensure t
+  :demand t
+  :config
+  (require 'esxml-query))
 (use-package nov
+  :ensure t
   :init
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
   :hook

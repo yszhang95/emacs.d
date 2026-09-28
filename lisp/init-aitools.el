@@ -207,30 +207,30 @@ Insert Original + Version B + Notes into a foldable Org drawer below."
 ;; (setq aidermacs-default-chat-mode 'architect)
 ;;; (global-set-key (kbd "C-c C-a") #'aidermacs-transient-menu)
 
-;; Copilot
-(require-package 'copilot)
-(add-hook 'prog-mode-hook #'copilot-mode)
-(add-hook 'cbase-mode-hook #'copilot-mode)
-(add-hook 'python-base-mode-hook #'copilot-mode)
-(add-hook 'python-mode-hook #'copilot-mode)
-;; ;; (setq copilot-network-proxy '(:host "127.0.0.1" :port 11435 :rejectUnauthorized :json-false))
-;; ;; (setq copilot-lsp-settings
-;; ;;       '(:http (:proxy "http://127.0.0.1:11435" :proxyStrictSSL :json-false)))
-(with-eval-after-load 'copilot
-  (define-key copilot-mode-map (kbd "C-<tab>" )
-              #'copilot-accept-completion)
-  (setq copilot-idle-delay 0.5
-        copilot-indent-offset-warning-disable t)
-  ;; (setq copilot-lsp-settings '(:github (:copilot (:selectedCompletionModel "o4-mini"))))
-  (add-to-list 'copilot-major-mode-alist '("python-ts" . "python"))
-  (add-to-list 'copilot-major-mode-alist '("jupyter-python" . "python")))
+;; ;; Copilot
+;; (require-package 'copilot)
+;; (add-hook 'prog-mode-hook #'copilot-mode)
+;; (add-hook 'cbase-mode-hook #'copilot-mode)
+;; (add-hook 'python-base-mode-hook #'copilot-mode)
+;; (add-hook 'python-mode-hook #'copilot-mode)
+;; ;; ;; (setq copilot-network-proxy '(:host "127.0.0.1" :port 11435 :rejectUnauthorized :json-false))
+;; ;; ;; (setq copilot-lsp-settings
+;; ;; ;;       '(:http (:proxy "http://127.0.0.1:11435" :proxyStrictSSL :json-false)))
+;; (with-eval-after-load 'copilot
+;;   (define-key copilot-mode-map (kbd "C-<tab>" )
+;;               #'copilot-accept-completion)
+;;   (setq copilot-idle-delay 0.5
+;;         copilot-indent-offset-warning-disable t)
+;;   ;; (setq copilot-lsp-settings '(:github (:copilot (:selectedCompletionModel "o4-mini"))))
+;;   (add-to-list 'copilot-major-mode-alist '("python-ts" . "python"))
+;;   (add-to-list 'copilot-major-mode-alist '("jupyter-python" . "python")))
 
-;;; copilot-chat
-;;; does it only work under emacs 30?
-;; (require-package 'copilot-chat)
-;; (global-set-key (kbd "C-c C-y") #'copilot-chat-yank)
-;; (global-set-key (kbd "C-c M-y") #'copilot-chat-yank-pop)
-;; (global-set-key (kbd "C-c C-M-y") #'(lambda () (interactive) (copilot-chat-yank-pop -1)))
+;; ;;; copilot-chat
+;; ;;; does it only work under emacs 30?
+;; ;; (require-package 'copilot-chat)
+;; ;; (global-set-key (kbd "C-c C-y") #'copilot-chat-yank)
+;; ;; (global-set-key (kbd "C-c M-y") #'copilot-chat-yank-pop)
+;; ;; (global-set-key (kbd "C-c C-M-y") #'(lambda () (interactive) (copilot-chat-yank-pop -1)))
 
 
 ;;; In the future, I want to try:
