@@ -3,10 +3,11 @@
 ;;; Code:
 
 ;;; copy from https://yiufung.net/post/anki-org/
-(require-package 'use-package)
 (require-package 'sqlite3)
 
 (use-package anki-editor
+  :vc (:url "https://github.com/anki-editor/anki-editor.git"
+       :rev :newest)
   :after org
   :commands anki-editor-mode
   :bind (:map org-mode-map
