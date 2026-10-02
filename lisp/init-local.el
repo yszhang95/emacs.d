@@ -155,13 +155,24 @@
 ;;; https://github.com/emacs-jupyter/jupyter/issues/488.
 ;;; https://github.com/emacs-jupyter/jupyter/issues/478#issuecomment-1676442126
 ;;; I prefer to use paired mode and edit .py file.
-(require-package 'jupyter)
+(use-package jupyter
+  :ensure t
+  :defer t
+  :init
+  ;; Echo evaluated code and its output in the REPL buffer too
+  (setq jupyter-repl-echo-eval-p t)
+  ;; Show results in the minibuffer/pop-up instead of inline overlays (optional)
+  (setq jupyter-eval-use-overlays nil)
+  ;; Results with more lines than this go to the pop-up buffer (optional)
+  (setq jupyter-eval-short-result-max-lines 20)
+  (require 'init-jupyter-rpc))
 (require-package 'code-cells)
 (add-hook 'python-base-mode-hook 'code-cells-mode-maybe)
 (use-package ox-ipynb
   :vc (:url "https://github.com/jkitchin/ox-ipynb.git"
-       :rev :newest)
+            :rev :newest)
   :after ox)
+
 
 ;;; This on ly works for old jupyter notebook, not jupyter lab, not new jupyter notebook
 ;; # In bash,
@@ -400,6 +411,7 @@
 
 (add-hook 'eglot-managed-mode-hook #'gpt/eglot-hook)
 
+
 ;; TRAMP
 (use-package tramp
   :config
@@ -407,6 +419,23 @@
   (add-to-list 'tramp-connection-properties
                (list (regexp-quote "/scpx:yousen@dekstop:")
                      "remote-shell" "/bin/bash")))
+
+(use-package tramp-rpc
+  :after tramp
+  :vc (:url "https://github.com/ArthurHeymans/emacs-tramp-rpc"
+            :rev :newest
+            :lisp-dir "lisp"))
+(use-package envrc
+  :ensure t
+  :hook (after-init . envrc-global-mode)
+  :config
+  (setq envrc-remote t)
+  (setq envrc-async nil)
+  (require 'init-envrc-rpc))
+
+
+(use-package vterm
+  :ensure t)
 
 (use-package cdlatex
   :ensure t)
