@@ -742,6 +742,9 @@
    (concat "https://www.google.com/search?q="
            (url-hexify-string query))))
 
+(ensure-lib-from-url 'vidlearn "https://codeberg.org/yszhang95/vidlearn/raw/branch/master/emacs/vidlearn.el")
+(require 'vidlearn)
+
 
 (provide 'init-local)
 ;;; init-local.el ends here
