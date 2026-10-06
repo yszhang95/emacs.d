@@ -8,6 +8,8 @@
 ;; Without a local jupyter this fails with "Searching for program: jupyter".
 ;; Presetting the cache variable skips that lookup; remote buffers still ask
 ;; the remote host for its own runtime directory.
+;; Status: confirmed on emacs-jupyter 20260813.  Remove when: a local `jupyter'
+;; is always installed (the `when' below then does nothing anyway).
 (when (and (memq system-type '(darwin gnu/linux))
            (not (executable-find "jupyter")))
   (setq jupyter-runtime-directory
@@ -20,6 +22,11 @@
 ;; connection file to vanish with a zero second `jupyter-with-timeout'.  With
 ;; tramp-rpc that timeout never fires, so if the file lingers Emacs spins at
 ;; 100% CPU forever.  Use a bounded wait and delete the file ourselves.
+;; Status: written for the first hang (a 25 minute busy loop).  It is a copy of
+;; upstream code and is probably redundant now that section 3 keeps timers
+;; alive, but I have not tested without it.  Remove when: `jupyter-run-repl'
+;; works from a /rpc: buffer with this advice deleted.  It may break if
+;; upstream changes `jupyter-session-with-random-ports'.
 (with-eval-after-load 'jupyter-env
   (require 'rx)
   (declare-function jupyter-new-uuid "jupyter-messages")
@@ -72,6 +79,11 @@ Call ORIG-FN with ARGS for local directories."
 ;; Any `jupyter-with-timeout' loop that touches a remote file (for example
 ;; waiting for a kernel to read its connection file) then never times out and
 ;; Emacs sits there forever.  Keep timers running while jupyter starts kernels.
+;; Status: the timer mechanism was confirmed by an A/B test on Emacs 31.1.
+;; Remove when: a newer Emacs/TRAMP fixes `with-tramp-suspended-timers', or
+;; `jupyter-run-repl' works without this advice (unknown whether newer versions
+;; do).  The remaining 10-13 s wait per launch is jupyter waiting out its
+;; timeout, because tramp-rpc reports file times in whole seconds.
 (defvar tramp-dont-suspend-timers)
 
 (defun yz/jupyter-keep-timers (fn &rest args)
