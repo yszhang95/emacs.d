@@ -219,12 +219,12 @@
 ;;; when exiting the code block with C-c ', there must be at least one source block below it.
 ;;; Otherwise, the content at the end is lost when exiting the special edit buffer.
 ;;; eglot can only work when it is already working under other .py for the project.
-(use-package org-src-context
-  :vc (:url "https://github.com/karthink/org-src-context.git")
-  :after org
-  :config
-  (add-hook 'org-mode-hook #'org-src-context-mode)
-  (add-hook 'org-src-mode-hook #'yz/temp-file-directory-from-env-per-buffer))
+;; (use-package org-src-context
+;;   :vc (:url "https://github.com/karthink/org-src-context.git")
+;;   :after org
+;;   :config
+;;   (add-hook 'org-mode-hook #'org-src-context-mode)
+;;   (add-hook 'org-src-mode-hook #'yz/temp-file-directory-from-env-per-buffer))
 
 (with-eval-after-load 'org
   (add-to-list 'org-babel-load-languages '(jupyter . t) t)
@@ -744,6 +744,9 @@
 
 (ensure-lib-from-url 'vidlearn "https://codeberg.org/yszhang95/vidlearn/raw/branch/master/emacs/vidlearn.el")
 (require 'vidlearn)
+
+(require 'init-wolfram)
+
 
 
 (provide 'init-local)
