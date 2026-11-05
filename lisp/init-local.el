@@ -63,8 +63,7 @@
 (require 'init-anki)
 
 ;;; configure Chinese input
-;; (require 'init-chinese)
-;; a lot of things broken
+(require 'init-chinese)
 
 ;;; C++
 ;;; (require 'init-cpp)

@@ -3,12 +3,13 @@
 ;;; Code:
 
 (require-package 'pyim)
+(require-package 'pyim-basedict)
 
 ;;; Chinese input from https://github.com/tumashu/pyim
 (require 'pyim)
-;; (require 'pyim-basedict)
+(require 'pyim-basedict)
 (require 'pyim-cregexp-utils)
-;; (pyim-basedict-enable)
+(pyim-basedict-enable)
 
 ;;; put pyim-tsinghua-dict under ~/.emacs.d/site-lisp/
 ;;; see https://github.com/redguardtoo/pyim-tsinghua-dict
@@ -28,15 +29,95 @@
 
 ;;; I do not want it to work globally
 ;;; I only write text in Chinese in org-mode.
-;; (setq default-input-method "pyim")
-;; (add-hook 'org-mode-hook
-;;           (lambda () (pyim-activate) (pyim-toggle-input-ascii)))
-(add-hook 'org-mode-hook (pyim-activate))
+;;; `default-input-method' only tells C-\ which method to use; nothing is
+;;; activated globally.  M-j in org-mode activates pyim by itself.
+(setq default-input-method "pyim")
 
 (with-eval-after-load 'org
   ;; (define-key org-mode-map (kbd "C-M-j") #'pyim-toggle-input-ascii)
   (define-key org-mode-map (kbd "M-j") #'pyim-convert-string-at-point)
   (define-key org-mode-map (kbd "C-M-j")   #'pyim-convert-string-at-point))
+
+;;; M-j in eat: turn the pinyin just typed into Chinese.
+;;; `pyim-convert-string-at-point' cannot work there, because the program
+;;; in the terminal owns the text.  So remember the letters sent to the
+;;; terminal, pick the words in the minibuffer, then send one DEL per
+;;; letter followed by the result.  Reading from the screen is avoided on
+;;; purpose: TUIs such as Claude Code do not keep the cursor at the text.
+(defconst my/eat-pyim-max-length 64
+  "Forget the tracked letters when they grow longer than this.")
+
+(defvar-local my/eat-pyim-pinyin ""
+  "Lowercase letters most recently sent to the terminal in this buffer.")
+
+(defvar my/eat-pyim--pending nil
+  "Pinyin being converted by `my/eat-pyim--minibuffer-run'.")
+
+(defun my/eat-pyim--track (n &optional e)
+  "Update `my/eat-pyim-pinyin' for event E sent N times."
+  (setq my/eat-pyim-pinyin
+        (cond
+         ((not (eql n 1)) "")
+         ((and (characterp e) (or (<= ?a e ?z) (eql e ?')))
+          (let ((pinyin (concat my/eat-pyim-pinyin (string e))))
+            (if (> (length pinyin) my/eat-pyim-max-length) "" pinyin)))
+         ((memq e '(127 backspace))
+          (if (string-empty-p my/eat-pyim-pinyin)
+              ""
+            (substring my/eat-pyim-pinyin 0 -1)))
+         (t ""))))
+
+(defun my/eat-pyim--minibuffer-run ()
+  "Run pyim on `my/eat-pyim--pending', then exit the minibuffer with the result."
+  (interactive)
+  (activate-input-method "pyim")
+  (unwind-protect
+      (progn
+        (pyim-add-unread-command-events my/eat-pyim--pending)
+        ;; Skip the probes, as `pyim-convert-string-at-point' does.
+        (pyim-process--force-input-chinese)
+        (insert (concat (pyim-input-method nil))))
+    (deactivate-input-method))
+  (exit-minibuffer))
+
+(defun my/eat-pyim--read (pinyin)
+  "Choose Chinese words for PINYIN; return \"\" when cancelled."
+  (let ((my/eat-pyim--pending pinyin)
+        (map (make-sparse-keymap)))
+    (set-keymap-parent map minibuffer-local-map)
+    (define-key map [my-eat-pyim-start] #'my/eat-pyim--minibuffer-run)
+    (minibuffer-with-setup-hook
+        (lambda ()
+          (setq unread-command-events
+                (cons 'my-eat-pyim-start unread-command-events)))
+      (read-from-minibuffer "pyim: " nil map))))
+
+(defun my/eat-pyim-convert ()
+  "Replace the pinyin just typed in the terminal with Chinese.
+Without tracked pinyin, send M-j to the terminal as usual."
+  (interactive)
+  (let ((pinyin my/eat-pyim-pinyin))
+    (if (string-empty-p pinyin)
+        (eat-self-input 1 (aref (kbd "M-j") 0))
+      (let ((result (my/eat-pyim--read pinyin)))
+        ;; Cancelling leaves the letters on screen, so keep tracking them.
+        (unless (or (string-empty-p result) (string= result pinyin))
+          (eat-term-send-string
+           eat-terminal
+           (concat (make-string (length pinyin) ?\d) result))
+          (setq my/eat-pyim-pinyin ""))))))
+
+;; The probes look at the text before point, which in a terminal is not
+;; what is being typed: with them, C-\ in eat would only produce English.
+(defun my/eat-pyim-disable-probes ()
+  "Let pyim input Chinese in this eat buffer whenever it is active."
+  (setq-local pyim-english-input-switch-functions nil))
+
+(add-hook 'eat-mode-hook #'my/eat-pyim-disable-probes)
+
+(with-eval-after-load 'eat
+  (advice-add 'eat-self-input :before #'my/eat-pyim--track)
+  (define-key eat-semi-char-mode-map (kbd "M-j") #'my/eat-pyim-convert))
 
 ;; 显示5个候选词。
 (setq pyim-page-length 5)
