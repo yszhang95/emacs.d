@@ -481,15 +481,14 @@
 
 
 (require-package 'pdf-tools)
-;;; if not found epdfinfo, do (pdf-tools-install)
-(when (eq system-type 'darwin)  ;; I work with MacPorts
-  ;; Set PKG_CONFIG_PATH for MacPorts
-  (setenv "PKG_CONFIG_PATH"
-          (concat "/opt/local/lib/pkgconfig:"
-                  (or (getenv "PKG_CONFIG_PATH") "")))
-  ;; Install or rebuild pdf-tools
-  (pdf-tools-install))
-(add-to-list 'auto-mode-alist '("\\.pdf\\'" . pdf-view-mode))
+;;; epdfinfo is kept at a fixed path so pdf-tools upgrades don't trigger a rebuild.
+;;; To force a rebuild (needs `brew install poppler'):
+;;;   (pdf-tools-build-server "~/.local/bin/")
+;;; `pdf-tools-install' only rebuilds if epdfinfo is broken, and when it does it
+;;; builds straight into ~/.local/bin/.
+(when (eq system-type 'darwin)
+  (setq pdf-info-epdfinfo-program (expand-file-name "~/.local/bin/epdfinfo"))
+  (pdf-loader-install))
 
 (use-package org-noter
   :ensure t
