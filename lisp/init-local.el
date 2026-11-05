@@ -423,8 +423,10 @@
 (use-package tramp-rpc
   :after tramp
   :vc (:url "https://github.com/ArthurHeymans/emacs-tramp-rpc"
-            :rev :newest
-            :lisp-dir "lisp"))
+            :rev "v0.15.0"
+            :lisp-dir "lisp")
+  :config
+  (setq tramp-rpc-deploy-git-build-policy 'release))
 (use-package envrc
   :ensure t
   :hook (after-init . envrc-global-mode)
